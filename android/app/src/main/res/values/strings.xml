@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">consorcia</string>
+    <string name="title_activity_main">consorcia</string>
+    <string name="package_name">com.consorcia.app</string>
+    <string name="custom_url_scheme">com.consorcia.app</string>
+</resources>
