@@ -16,6 +16,15 @@ import {
   FiChevronDown,
   FiChevronUp,
 } from "react-icons/fi";
+import { 
+  AiOutlineCheckCircle, 
+  AiOutlineWarning, 
+  AiOutlineCloseCircle, 
+  AiOutlineInfoCircle,
+  AiOutlineUpload,
+  AiOutlineSearch
+} from "react-icons/ai";
+
 
 const NAV = [
   { key: "dashboard", label: "Dashboard", icon: FiHome },
@@ -472,10 +481,18 @@ export default function DemoPage() {
           <div className="section">
             <h3>Alertas</h3>
             <div className="row stack mt-12">
-              <div className="alert alert-success">✅ Todo OK</div>
-              <div className="alert alert-warning">⚠ Atención</div>
-              <div className="alert alert-error">❌ Error</div>
-              <div className="alert alert-info">ℹ Información</div>
+              <div className="alert alert-success">
+                <AiOutlineCheckCircle size={18} /> Todo OK
+              </div>
+              <div className="alert alert-warning">
+                <AiOutlineWarning size={18} /> Atención
+              </div>
+              <div className="alert alert-error">
+                <AiOutlineCloseCircle size={18} /> Error
+              </div>
+              <div className="alert alert-info">
+                <AiOutlineInfoCircle size={18} /> Información
+              </div>
             </div>
           </div>
 
@@ -830,7 +847,9 @@ export default function DemoPage() {
                   <div className="field">
                     <div className="label">Buscar (con ícono)</div>
                     <div className="input-wrap">
-                      <span className="input-icon">🔎</span>
+                      <span className="input-icon">
+                        <AiOutlineSearch size={16} />
+                      </span>
                       <input
                         className="control has-icon"
                         placeholder="Buscar…"
@@ -875,7 +894,21 @@ export default function DemoPage() {
 
                   <div className="field">
                     <div className="label">Archivo (File)</div>
-                    <input type="file" className="control file" onChange={onChange("archivo")} />
+
+                    {/* Input nativo oculto */}
+                    <input
+                      type="file"
+                      id="file-upload"
+                      style={{ display: "none" }}
+                      onChange={onChange("archivo")}
+                    />
+
+                    {/* Botón estilizado que activa el input */}
+                    <label htmlFor="file-upload" className="btn btn-outline" style={{ cursor: "pointer", width: "fit-content" }}>
+                      <AiOutlineUpload size={18} />
+                      {form.archivo ? form.archivo.name : "Seleccionar archivo"}
+                    </label>
+
                     <div className="helper">
                       {form.archivo ? `Archivo: ${form.archivo.name}` : "Seleccioná un archivo."}
                     </div>
