@@ -1,38 +1,71 @@
 /* =====================================================
    CONSORCIA UI – SINGLE SOURCE OF TRUTH
-   Light / Dark / AMOLED  — v2 (responsive fix)
+   Light / Dark / AMOLED  — v3 (brand palette update)
    ===================================================== */
 
 /* ===============================
    TOKENS
    =============================== */
 :root {
-    --c-bg: #f8fafc;
+    /* === Brand palette === */
+    --c-navy: #0F2044;
+    /* Navy */
+    --c-blue: #1A4DB5;
+    /* Azul principal */
+    --c-blue-light: #3B82F6;
+    /* Azul claro */
+    --c-teal: #0EA5A0;
+    /* Teal acento */
+    --c-gold: #F5A623;
+    /* Dorado */
+    --c-bg-light: #F0F4FF;
+    /* Fondo claro */
+
+    /* === Core surfaces === */
+    --c-bg: var(--c-bg-light);
     --c-surface: #ffffff;
-    --c-border: #e5e7eb;
+    --c-border: #C8D4EE;
+    /* [v3] reforzado con más tinte azul navy */
 
-    --c-text: #1f2937;
-    --c-text-muted: #6b7280;
+    /* === Typography === */
+    --c-text: var(--c-navy);
+    --c-text-muted: #4A5A7A;
+    /* [v3] más alineado al navy */
 
-    --c-primary: #1f3a5f;
-    --c-primary-soft: #e6eef6;
+    /* === Primary & interaction === */
+    --c-primary: var(--c-blue);
+    --c-primary-soft: #e3ecff;
+    /* hover/active backgrounds (tinte del azul principal) */
 
-    --c-success: #2f855a;
-    --c-success-soft: #e6f4ea;
+    /* === Status colors === */
+    --c-success: var(--c-teal);
+    --c-success-soft: #d0f5f3;
+    /* [v3] renombrado a teal-soft para coherencia */
 
-    --c-warning: #b45309;
-    --c-warning-soft: #fef3c7;
+    --c-warning: var(--c-gold);
+    --c-warning-soft: #FEF3D7;
+    /* [v3] gold-soft, antes #fff1db */
 
     --c-error: #b91c1c;
     --c-error-soft: #fee2e2;
 
-    --c-info: #2563eb;
+    --c-info: var(--c-blue-light);
     --c-info-soft: #dbeafe;
 
-    --radius: 12px;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --ring: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    /* === New soft tokens [v3] === */
+    --c-teal-soft: #d0f5f3;
+    /* para badges/estados "activo", "al día", "pagado" */
+    --c-gold-soft: #FEF3D7;
+    /* para estados "pendiente", "en revisión" */
 
+    /* === Shape & effects === */
+    --radius: 12px;
+    --shadow-sm: 0 1px 2px rgba(15, 32, 68, 0.08);
+
+    /* [v3] Focus ring con teal para identidad de marca más única */
+    --ring: 0 0 0 3px rgba(14, 165, 160, 0.22);
+
+    /* Layout */
     --header-h: 56px;
     --sidebar-w: 260px;
     --sidebar-collapsed-w: 64px;
@@ -42,17 +75,33 @@
    DARK
    =============================== */
 html[data-theme="dark"] {
-    --c-bg: #0f172a;
-    --c-surface: #1e293b;
-    --c-border: #334155;
+    --c-bg: #0b1220;
+    --c-surface: #101b33;
+    --c-border: #223153;
 
-    --c-text: #e2e8f0;
-    --c-text-muted: #94a3b8;
+    --c-text: #eaf0ff;
+    --c-text-muted: #a9b8db;
 
-    --c-primary: #3b82f6;
-    --c-primary-soft: #1e3a5f;
+    /* Primary sigue siendo Azul claro para más "vivo" en dark */
+    --c-primary: #3B82F6;
+    --c-primary-soft: rgba(59, 130, 246, 0.16);
+
+    --c-success: #0EA5A0;
+    --c-success-soft: rgba(14, 165, 160, 0.18);
+
+    --c-warning: #F5A623;
+    --c-warning-soft: rgba(245, 166, 35, 0.18);
+
+    --c-info: #3B82F6;
+    --c-info-soft: rgba(59, 130, 246, 0.18);
+
+    /* [v3] soft tokens adaptados para dark */
+    --c-teal-soft: rgba(14, 165, 160, 0.18);
+    --c-gold-soft: rgba(245, 166, 35, 0.18);
 
     --shadow-sm: none;
+    --ring: 0 0 0 3px rgba(14, 165, 160, 0.28);
+    /* [v3] teal ring en dark también */
 }
 
 /* ===============================
@@ -60,16 +109,31 @@ html[data-theme="dark"] {
    =============================== */
 html[data-theme="amoled"] {
     --c-bg: #000000;
-    --c-surface: #0a0a0a;
-    --c-border: #1e293b;
+    --c-surface: #070b14;
+    --c-border: #162342;
 
-    --c-text: #e5e7eb;
-    --c-text-muted: #94a3b8;
+    --c-text: #eef3ff;
+    --c-text-muted: #a0b0d4;
 
-    --c-primary: #3b82f6;
-    --c-primary-soft: #0b1220;
+    --c-primary: #3B82F6;
+    --c-primary-soft: rgba(59, 130, 246, 0.16);
+
+    --c-success: #0EA5A0;
+    --c-success-soft: rgba(14, 165, 160, 0.18);
+
+    --c-warning: #F5A623;
+    --c-warning-soft: rgba(245, 166, 35, 0.18);
+
+    --c-info: #3B82F6;
+    --c-info-soft: rgba(59, 130, 246, 0.18);
+
+    /* [v3] soft tokens adaptados para amoled */
+    --c-teal-soft: rgba(14, 165, 160, 0.18);
+    --c-gold-soft: rgba(245, 166, 35, 0.18);
 
     --shadow-sm: none;
+    --ring: 0 0 0 3px rgba(14, 165, 160, 0.28);
+    /* [v3] teal ring en amoled también */
 }
 
 /* ===============================
@@ -256,11 +320,12 @@ button {
     min-width: 0;
 }
 
+/* [v3] gradiente azul→teal para reforzar identidad de marca */
 .brand-mark {
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    background: var(--c-primary);
+    background: linear-gradient(135deg, var(--c-blue), var(--c-teal));
     color: #fff;
     display: flex;
     align-items: center;
@@ -427,7 +492,6 @@ button {
     grid-area: content;
     padding: 24px;
     min-width: 0;
-    /* prevents overflow blowout */
     overflow-x: hidden;
 }
 
@@ -631,6 +695,18 @@ button {
 .badge-info {
     background: var(--c-info-soft);
     color: var(--c-info);
+}
+
+/* [v3] badge teal — para estados "activo", "al día", "pagado" */
+.badge-teal {
+    background: var(--c-teal-soft);
+    color: var(--c-teal);
+}
+
+/* [v3] badge gold — para estados "pendiente", "en revisión" */
+.badge-gold {
+    background: var(--c-gold-soft);
+    color: #92540a;
 }
 
 /* ===============================
@@ -1086,9 +1162,10 @@ button {
     appearance: auto;
 }
 
+/* [v3] borde teal al enfocar — más identidad de marca */
 .control:focus {
     outline: none;
-    border-color: var(--c-primary);
+    border-color: var(--c-teal);
     box-shadow: var(--ring);
 }
 
@@ -1190,8 +1267,9 @@ button {
     flex-shrink: 0;
 }
 
+/* [v3] switch activo en teal para diferenciarlo del botón primario */
 .switch input:checked+.switch-track {
-    background: var(--c-primary);
+    background: var(--c-teal);
 }
 
 .switch-thumb {
@@ -1229,7 +1307,6 @@ button {
    =============================== */
 @media (max-width: 900px) {
 
-    /* Single-column shell */
     .app-shell,
     .app-shell.sidebar-collapsed {
         grid-template-columns: 1fr;
@@ -1238,7 +1315,6 @@ button {
             "content";
     }
 
-    /* Sidebar becomes fixed drawer */
     .sidebar {
         position: fixed;
         top: 0;
@@ -1256,7 +1332,6 @@ button {
         transform: translateX(0);
     }
 
-    /* Overlay */
     .sidebar-overlay {
         display: block;
         position: fixed;
