@@ -159,6 +159,9 @@ body {
     font-size: 14px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
+
 }
 
 h1,
