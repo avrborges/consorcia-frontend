@@ -37,7 +37,7 @@ function buildMockToken(email) {
 export function useLogin({ onSuccess } = {}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(true);
+  // const [remember, setRemember] = useState(true);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -81,7 +81,7 @@ export function useLogin({ onSuccess } = {}) {
         const token = buildMockToken(trimmedEmail);
 
         // 5) Persistencia
-        const storage = remember ? localStorage : sessionStorage;
+        const storage = sessionStorage;
         storage.setItem("consorcia_token", token);
         storage.setItem("consorcia_user", JSON.stringify(user));
         storage.setItem("consorcia_auth_mode", "mock");
@@ -97,7 +97,7 @@ export function useLogin({ onSuccess } = {}) {
         setError("Ocurrió un error inesperado en el login (demo).");
       }
     },
-    [email, password, remember, onSuccess]
+    [email, password, onSuccess]
   );
 
   return {
@@ -105,8 +105,8 @@ export function useLogin({ onSuccess } = {}) {
     setEmail,
     password,
     setPassword,
-    remember,
-    setRemember,
+    // remember,
+    // setRemember,
     loading,
     error,
     clearError,
