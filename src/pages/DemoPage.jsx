@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+// import "../styles/consorcia.css";
 import {
   FiHome,
   FiDollarSign,

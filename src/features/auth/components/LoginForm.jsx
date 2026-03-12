@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { IoChevronBackOutline } from "react-icons/io5";
 import { useLogin } from "../hooks/useLogin";
 
 export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotPassword }) {
@@ -8,8 +7,6 @@ export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotP
     setEmail,
     password,
     setPassword,
-    // remember,
-    // setRemember,
     loading,
     error,
     submit,
@@ -20,125 +17,123 @@ export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotP
 
   return (
     <form onSubmit={submit} className="space-y-4" aria-label="Formulario de login">
+
       {/* Error */}
-      {error ? (
+      {error && (
         <div
-          className="
-            rounded-xl px-3 py-2
-            bg-red-500/15 text-red-100
-            ring-1 ring-red-400/20
-            text-sm
-          "
           role="alert"
+          className="rounded-xl px-3 py-2.5 text-sm"
+          style={{
+            background: "#fee2e2",
+            color: "#b91c1c",
+            border: "1px solid rgba(185,28,28,0.15)",
+          }}
         >
           {error}
         </div>
-      ) : null}
+      )}
 
       {/* Email */}
-      <div className="space-y-1">
-        <label className="text-white/80 text-sm font-medium">Email</label>
+      <div className="space-y-1.5">
+        <label className="text-[#0F2044] text-[13px] font-semibold">
+          Email
+        </label>
         <input
           type="email"
           value={email}
-          onChange={(e) => {
-            clearError();
-            setEmail(e.target.value);
-          }}
+          onChange={(e) => { clearError(); setEmail(e.target.value); }}
           placeholder="tu@email.com"
           autoComplete="email"
+          required
           className="
             w-full rounded-xl
-            bg-white/10 text-white
-            placeholder:text-white/45
-            border border-white/15
             px-3 py-2.5
+            text-[#0F2044] text-[13px]
+            placeholder:text-[#4A5A7A]/50
             outline-none
-            transition
-            focus:border-sky-400/60
-            focus:ring-4 focus:ring-sky-400/20
+            transition duration-150
+            focus:ring-2 focus:ring-[#0EA5A0]/40
           "
-          required
+          style={{
+            background: "#ffffff",
+            border: "1px solid #C8D4EE",
+          }}
+          onFocus={e => e.target.style.borderColor = "#0EA5A0"}
+          onBlur={e => e.target.style.borderColor = "#C8D4EE"}
         />
       </div>
 
       {/* Password */}
-      <div className="space-y-1">
-        <label className="text-white/80 text-sm font-medium">Contraseña</label>
-
+      <div className="space-y-1.5">
+        <label className="text-[#0F2044] text-[13px] font-semibold">
+          Contraseña
+        </label>
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
             value={password}
-            onChange={(e) => {
-              clearError();
-              setPassword(e.target.value);
-            }}
+            onChange={(e) => { clearError(); setPassword(e.target.value); }}
             placeholder="••••••••"
             autoComplete="current-password"
+            required
             className="
               w-full rounded-xl
-              bg-white/10 text-white
-              placeholder:text-white/45
-              border border-white/15
-              px-3 py-2.5 pr-12
+              px-3 py-2.5 pr-20
+              text-[#0F2044] text-[13px]
+              placeholder:text-[#4A5A7A]/50
               outline-none
-              transition
-              focus:border-sky-400/60
-              focus:ring-4 focus:ring-sky-400/20
+              transition duration-150
+              focus:ring-2 focus:ring-[#0EA5A0]/40
             "
-            required
+            style={{
+              background: "#ffffff",
+              border: "1px solid #C8D4EE",
+            }}
+            onFocus={e => e.target.style.borderColor = "#0EA5A0"}
+            onBlur={e => e.target.style.borderColor = "#C8D4EE"}
           />
-
           <button
             type="button"
-            onClick={() => setShowPassword((v) => !v)}
+            onClick={() => setShowPassword(v => !v)}
+            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
             className="
               absolute right-2 top-1/2 -translate-y-1/2
-              px-2 py-1 rounded-lg
-              text-white/70 text-xs font-semibold
-              bg-white/10 hover:bg-white/15
-              transition
-              focus:outline-none focus:ring-2 focus:ring-sky-400/40
+              px-2.5 py-1 rounded-lg
+              text-[#4A5A7A] text-[11px] font-semibold
+              transition-colors duration-150
+              focus:outline-none focus-visible:ring-2
+              focus-visible:ring-[#0EA5A0]
             "
-            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            style={{
+              background: "#F0F4FF",
+              border: "1px solid #C8D4EE",
+              touchAction: "manipulation",
+            }}
           >
             {showPassword ? "Ocultar" : "Ver"}
           </button>
         </div>
       </div>
 
-      {/* Remember */}
-      <div className="flex items-center justify-center">
-        {/* <label className="flex items-center gap-2 text-white/75 text-sm select-none">
-          <input
-            type="checkbox"
-            checked={remember}
-            onChange={(e) => setRemember(e.target.checked)}
-            className="
-              h-4 w-4 rounded
-              border-white/30 bg-white/10
-              text-sky-500
-              focus:ring-4 focus:ring-sky-400/20
-            "
-          />
-          Recordarme
-        </label> */}
-
-        {/* Placeholder sin backend: link informativo */}
-        <span className="text-white/55 text-center gap-1.5 text-sm w-full">
-          ¿Olvidaste tu contraseña?{" "}
-          <button
-            type="button"
-            onClick={onForgotPassword}
-            className="font-semibold text-amber-400 hover:text-amber-300 transition"
-          >
-            Recuperala
-          </button>
-        </span>
+      {/* ¿Olvidaste tu contraseña? */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={onForgotPassword}
+          className="
+            text-[13px] font-semibold
+            text-[#1A4DB5] hover:text-[#0EA5A0]
+            transition-colors duration-150
+            focus:outline-none focus-visible:ring-2
+            focus-visible:ring-[#0EA5A0] rounded-sm
+          "
+          style={{ touchAction: "manipulation" }}
+        >
+          ¿Olvidaste tu contraseña?
+        </button>
       </div>
 
-      {/* CTA con micro-interacciones */}
+      {/* Botón CTA */}
       <button
         type="submit"
         disabled={loading}
@@ -146,77 +141,40 @@ export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotP
         className="
           group relative overflow-hidden
           w-full rounded-xl
-          px-6 py-3
-          font-semibold text-white tracking-wide
-          bg-gradient-to-r from-sky-500 to-blue-600
-          shadow-[0_10px_30px_rgba(0,0,0,0.25)]
-          transition-all duration-300 ease-out
-
-          hover:shadow-[0_16px_40px_rgba(0,0,0,0.35)]
-          hover:-translate-y-[1px]
-          active:scale-[0.98]
-
+          px-6 py-[13px]
+          font-semibold text-white
+          text-[13px] tracking-[0.12em]
+          transition-[transform,box-shadow] duration-200 ease-out
+          hover:-translate-y-px
+          active:scale-[0.97]
           disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none
           focus:outline-none
-          focus-visible:ring-4 focus-visible:ring-[rgba(14,165,160,0.35)]
-          will-change-transform
+          focus-visible:ring-2
+          focus-visible:ring-[#0EA5A0]
+          focus-visible:ring-offset-2
+          focus-visible:ring-offset-[#F0F4FF]
         "
+        style={{
+          background: "#1A4DB5",
+          border: "1px solid rgba(26,77,181,0.35)",
+          boxShadow: "0 4px 20px rgba(26,77,181,0.25)",
+          touchAction: "manipulation",
+        }}
+        onMouseEnter={e => !loading && (e.currentTarget.style.boxShadow = "0 6px 28px rgba(26,77,181,0.35)")}
+        onMouseLeave={e => !loading && (e.currentTarget.style.boxShadow = "0 4px 20px rgba(26,77,181,0.25)")}
       >
-        {/* Shine overlay */}
         <span
           aria-hidden="true"
-          className="
-            absolute inset-0 opacity-0 group-hover:opacity-100
-            transition-opacity duration-300
-            bg-[linear-gradient(110deg,transparent_0%,rgba(255,255,255,0.18)_35%,transparent_70%)]
-          "
+          className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/10"
         />
         <span className="relative z-10 flex items-center justify-center gap-2">
           {loading && (
-            <span
-              className="
-                h-4 w-4 animate-spin rounded-full
-                border-2 border-white border-t-transparent
-              "
-            />
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
           )}
           {loading ? "Ingresando…" : "INICIAR SESIÓN"}
         </span>
       </button>
 
-      {/* Secondary actions */}
-      <div className="pt-1 flex items-center justify-between text-sm">
-
-        <button
-        type="button"
-        onClick={onBackHome}
-        className="flex items-center gap-1 text-white/65 hover:text-white transition"
-        >
-        <IoChevronBackOutline className="text-lg" />
-        <span>Volver</span>
-        </button>
-
-
-        <p className="!text-white/70">
-          ¿No tenés cuenta?{" "}
-          <button
-            type="button"
-            onClick={onRegister}
-            className="
-              font-semibold text-amber-400
-              hover:text-amber-300
-              transition
-            "
-          >
-            Registrate
-          </button>
-        </p>
-      </div>
-
-      {/* Hint (demo credentials)
-      <div className="pt-2 text-xs text-white/50 leading-relaxed">
-        Tip demo: cualquier email válido y contraseña ≥ 4 caracteres.
-      </div> */}
     </form>
   );
 }
