@@ -4,3 +4,16 @@
     padding-bottom: env(safe-area-inset-bottom);
     padding-top: env(safe-area-inset-top);
 }
+
+@theme {
+    --color-c-navy: #0F2044;
+    --color-c-blue: #1A4DB5;
+    --color-c-teal: #0EA5A0;
+    --color-c-gold: #F5A623;
+
+    --background-image-brand-gradient: linear-gradient(135deg, #1A4DB5 0%, #0EA5A0 100%);
+
+    /* Sombras con Teal */
+    --shadow-teal-md: 0 4px 20px rgba(14, 165, 160, 0.25);
+    --shadow-teal-lg: 0 6px 28px rgba(14, 165, 160, 0.35);
+}
