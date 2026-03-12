@@ -14,7 +14,6 @@ export default function LoginPage({ onRegister }) {
       className="
         min-h-screen relative overflow-hidden bg-[#0F2044]
         pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]
-
         flex flex-col
         lg:flex-row
       "
@@ -28,15 +27,13 @@ export default function LoginPage({ onRegister }) {
 
       {/* ══════════════════════════════
           PANEL IZQUIERDO — Branding
-          Mobile: header compacto
-          Desktop: panel fijo 40%
+          Mobile: header compacto centrado
+          Desktop: panel fijo 42%
       ══════════════════════════════ */}
       <div
         className="
-          relative z-10
-          flex flex-col
+          relative z-10 flex flex-col
           px-6 pt-6 pb-8
-
           lg:w-[42%] lg:min-h-screen
           lg:items-center lg:justify-center
           lg:px-12 lg:py-12
@@ -48,7 +45,7 @@ export default function LoginPage({ onRegister }) {
           onClick={() => navigate("/")}
           aria-label="Volver al inicio"
           className="
-            w-9 h-9 rounded-xl
+            w-9 h-9 rounded-xl self-start
             flex items-center justify-center
             transition-colors duration-150
             focus:outline-none focus-visible:ring-2
@@ -68,70 +65,74 @@ export default function LoginPage({ onRegister }) {
           </svg>
         </button>
 
-        {/* Branding centrado — desktop */}
-        <div className="mt-6 lg:mt-0 lg:text-center flex flex-col lg:items-center">
+        {/* ── Branding mobile: logo + título en fila centrada ── */}
+        <div className="flex items-center justify-center gap-3 mt-6 lg:hidden">
+          <img
+            src={logoConsorcia}
+            alt="Logo CONSORCIA"
+            className="w-12 h-12 select-none flex-shrink-0"
+          />
+          <h1 className="text-white font-extrabold text-[26px] tracking-[0.3em] leading-tight m-0">
+            CONSOR<span className="text-[#F5A623]">CIA</span>
+          </h1>
+        </div>
 
-          {/* Mobile: logo + título en fila */}
-          <div className="flex gap-4 lg:flex-col lg:items-center lg:gap-6">
-            <img
-              src={logoConsorcia}
-              alt="Logo CONSORCIA"
-              className="
-                w-12 h-12 select-none flex-shrink-0 mt-1
-                lg:w-24 lg:h-24 lg:mt-0
-              "
-            />
-            <h1 className="
-              text-white font-extrabold leading-tight tracking-tight m-0
-              text-[26px]
-              lg:text-[32px] lg:tracking-[0.3em] lg:text-center
-            ">
-              CONSOR<span className="text-[#F5A623]">CIA</span>
-            </h1>
-          </div>
-
-          {/* Divisor — solo desktop */}
+        {/* Divisor + slogan — centrados debajo */}
+        <div className="flex flex-col items-center gap-2 mt-3 lg:hidden">
           <div
             aria-hidden="true"
-            className="hidden lg:block w-12 h-0.5 rounded-sm mx-auto my-4"
+            className="w-10 h-0.5 rounded-sm"
             style={{ background: "linear-gradient(90deg, #1A4DB5, #0EA5A0)" }}
           />
-
-          <p className="
-            text-white/50 font-light tracking-wide
-            text-[12px] mt-3 text-center
-            lg:text-[13px] lg:mt-0 lg:max-w-[220px]
-          ">
+          <p className="text-white/50 text-[11px] font-light tracking-[0.18em] uppercase text-center m-0">
             Gestión moderna para tu edificio
           </p>
         </div>
 
-        {/* Botón volver — solo desktop, abajo del panel */}
-        <button
-          type="button"
-          onClick={() => navigate("/")}
-          aria-label="Volver al inicio"
-          className="
-            hidden lg:flex
-            items-center gap-2
-            mt-auto
-            text-white/50 hover:text-white
-            text-[13px] transition-colors duration-150
-            focus:outline-none focus-visible:ring-2
-            focus-visible:ring-[#0EA5A0] rounded-sm
-          "
-          style={{ touchAction: "manipulation" }}
-        >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Volver al inicio
-        </button>
+        {/* ── Branding desktop: centrado en panel ── */}
+        <div className="hidden lg:flex flex-col items-center text-center gap-6">
+          <img
+            src={logoConsorcia}
+            alt="Logo CONSORCIA"
+            className="w-24 h-24 select-none"
+          />
+          <h1 className="text-white font-extrabold text-[32px] tracking-[0.3em] leading-tight m-0 text-center">
+            CONSOR<span className="text-[#F5A623]">CIA</span>
+          </h1>
+          <div
+            aria-hidden="true"
+            className="w-12 h-0.5 rounded-sm"
+            style={{ background: "linear-gradient(90deg, #1A4DB5, #0EA5A0)" }}
+          />
+          <p className="text-white/50 text-[13px] font-light tracking-wide text-center max-w-[220px] m-0">
+            Gestión moderna para tu edificio
+          </p>
+        </div>
 
-        {/* Version — solo desktop */}
-        <p className="hidden lg:block text-white/25 text-[11px] text-center mt-3 tracking-wide">
-          {APP_VERSION}
-        </p>
+        {/* Botón volver + versión — solo desktop, pegados al fondo */}
+        <div className="hidden lg:flex flex-col items-center gap-2 mt-auto">
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            aria-label="Volver al inicio"
+            className="
+              flex items-center gap-2
+              text-white/50 hover:text-white
+              text-[13px] transition-colors duration-150
+              focus:outline-none focus-visible:ring-2
+              focus-visible:ring-[#0EA5A0] rounded-sm
+            "
+            style={{ touchAction: "manipulation" }}
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Volver al inicio
+          </button>
+          <p className="text-white/25 text-[11px] tracking-wide m-0">
+            {APP_VERSION}
+          </p>
+        </div>
       </div>
 
       {/* ══════════════════════════════
@@ -144,7 +145,6 @@ export default function LoginPage({ onRegister }) {
           relative z-10 flex-1 flex flex-col
           px-6 pt-6 pb-8
           rounded-t-[28px]
-
           lg:rounded-none
           lg:w-[58%] lg:min-h-screen
           lg:items-center lg:justify-center
