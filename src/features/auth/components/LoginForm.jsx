@@ -6,11 +6,18 @@ export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotP
   const {
     email, setEmail,
     password, setPassword,
+    remember, setRemember,
     loading, error,
     submit, clearError,
   } = useLogin({ onSuccess });
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const emailValido    = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const passLongitud   = password.length >= 8;
+  const passMayuscula  = /[A-Z]/.test(password);
+  const passNumero     = /[0-9]/.test(password);
+  const formValido     = emailValido && passLongitud && passMayuscula && passNumero;
 
   return (
     <form onSubmit={submit} style={{ display:"flex", flexDirection:"column", gap:16 }} aria-label="Formulario de login">
@@ -156,6 +163,33 @@ export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotP
             {showPassword ? <FiEyeOff size={14} /> : <FiEye size={14} />}
           </button>
         </div>
+
+        {/* Indicadores de condiciones — solo si hay texto */}
+        {password.length > 0 && (
+          <div style={{ display:"flex", flexDirection:"column", gap:4, marginTop:8 }}>
+            {[
+              { ok: passLongitud,  label: "Mínimo 8 caracteres"    },
+              { ok: passMayuscula, label: "Al menos una mayúscula"  },
+              { ok: passNumero,    label: "Al menos un número"      },
+            ].map(({ ok, label }) => (
+              <div key={label} style={{ display:"flex", alignItems:"center", gap:6 }}>
+                <span style={{
+                  width: 6, height: 6, borderRadius: "50%", flexShrink: 0,
+                  background: ok ? "#2a6b6e" : "rgba(45,50,80,0.2)",
+                  transition: "background 0.2s",
+                }} />
+                <span style={{
+                  fontFamily: "'Raleway', sans-serif",
+                  fontSize: 11, fontWeight: 500,
+                  color: ok ? "#2a6b6e" : "rgba(45,50,80,0.4)",
+                  transition: "color 0.2s",
+                }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ¿Olvidaste tu contraseña? */}
@@ -185,7 +219,7 @@ export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotP
       {/* Botón CTA */}
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !formValido}
         aria-label="Iniciar sesión"
         className="lf-btn-cta"
       >

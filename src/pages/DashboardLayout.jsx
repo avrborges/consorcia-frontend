@@ -5,6 +5,7 @@ import {
   FiMenu, FiX,
 } from "react-icons/fi";
 import logoConsorcia from "../assets/img/consorcia.png";
+import { getStoredUser, logout } from "../features/auth/hooks/useLogin";
 
 const APP_VERSION = "v1.0.0";
 
@@ -13,9 +14,7 @@ const NAV_ITEMS = [
   { id: "configuracion", label: "Configuración", icon: FiSettings, path: "/configuracion" },
 ];
 
-/* ── Mock usuario / edificio (reemplazar por contexto real) ── */
-const USER  = { name: "Juan Pérez",   initials: "JP" };
-const BUILDING = "Edificio Las Acacias";
+/* ── Constantes de navegación ── */
 
 export default function DashboardLayout() {
   const navigate  = useNavigate();
@@ -24,6 +23,20 @@ export default function DashboardLayout() {
   const [drawerOpen,   setDrawerOpen]   = useState(false);
   const [notifOpen,    setNotifOpen]    = useState(false);
   const notifRef = useRef(null);
+
+  /* Datos de sesión reales */
+  const storedUser = getStoredUser();
+  const USER = {
+    name:     storedUser?.name ?? "Usuario",
+    initials: storedUser?.name ? storedUser.name.slice(0, 2).toUpperCase() : "U",
+    role:     storedUser?.role ?? "owner",
+  };
+  const BUILDING = "Edificio Las Acacias";
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   /* Cierra notif al hacer click fuera */
   useEffect(() => {
@@ -40,8 +53,6 @@ export default function DashboardLayout() {
   useEffect(() => { setDrawerOpen(false); }, [location.pathname]);
 
   const isActive = (path) => location.pathname.startsWith(path);
-
-  const handleLogout = () => navigate("/login");
 
   const sidebarW = collapsed ? 64 : 220;
 

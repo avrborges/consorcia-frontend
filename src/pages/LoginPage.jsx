@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { FiArrowLeft, FiLogIn, FiUserPlus } from "react-icons/fi";
 import logoConsorcia from "../assets/img/consorcia.png";
 import LoginForm from "../features/auth/components/LoginForm";
+import { isAuthenticated } from "../features/auth/hooks/useLogin";
 
 const APP_VERSION = "v1.0.0";
 
@@ -17,6 +18,9 @@ export default function LoginPage({ onRegister }) {
   const navigate   = useNavigate();
   const canvasRef  = useRef(null);
   const [activeTab, setActiveTab] = useState("login");
+
+  /* Redirige al dashboard si ya hay sesión activa */
+  if (isAuthenticated()) return <Navigate to="/dashboard" replace />;
 
   /* ── Canvas grid — solo panel izquierdo ── */
   useEffect(() => {

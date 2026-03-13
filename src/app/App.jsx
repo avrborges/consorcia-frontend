@@ -6,8 +6,7 @@ import Dashboard from '../pages/Dashboard'
 import ForgotPasswordPage from '../pages/ForgotPasswordPage'
 import DashboardLayout from '../pages/DashboardLayout'
 // Guards
-// import PublicOnlyRoute from './guards/PublicOnlyRoute'
-// import ProtectedRoute from './guards/ProtectedRoute'
+import AuthGuard from './guards/AuthGuard'
 // Estilos globales
 import "../styles/index.css"
 
@@ -19,7 +18,11 @@ function App() {
         <Route path='/login' element={<LoginPage /> } />
         <Route path='forgot-password' element={<ForgotPasswordPage />} />
         {/* Dashboard — layout envuelve a las páginas internas */}
-        <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route path="/dashboard" element={
+          <AuthGuard>
+            <DashboardLayout />
+          </AuthGuard >
+        }>
           <Route index element={<Dashboard />} />
         </Route>
       </Routes>
