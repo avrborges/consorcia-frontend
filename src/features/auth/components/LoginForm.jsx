@@ -1,32 +1,118 @@
 import React, { useState } from "react";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useLogin } from "../hooks/useLogin";
 
 export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotPassword }) {
   const {
-    email,
-    setEmail,
-    password,
-    setPassword,
-    loading,
-    error,
-    submit,
-    clearError,
+    email, setEmail,
+    password, setPassword,
+    loading, error,
+    submit, clearError,
   } = useLogin({ onSuccess });
 
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <form onSubmit={submit} className="space-y-4" aria-label="Formulario de login">
+    <form onSubmit={submit} style={{ display:"flex", flexDirection:"column", gap:16 }} aria-label="Formulario de login">
+
+      <style>{`
+        .lf-input {
+          width: 100%;
+          box-sizing: border-box;
+          border-radius: 12px;
+          padding: 11px 14px;
+          font-size: 13px;
+          font-family: 'Raleway', sans-serif;
+          font-weight: 400;
+          color: #2d3250;
+          background: #ffffff;
+          border: 1px solid #b0cfd0;
+          outline: none;
+          transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .lf-input::placeholder { color: rgba(91,122,138,0.45); }
+        .lf-input:focus {
+          border-color: #5b9ea0;
+          box-shadow: 0 0 0 3px rgba(91,158,160,0.15);
+        }
+        .lf-label {
+          font-family: 'Raleway', sans-serif;
+          font-size: 12px;
+          font-weight: 600;
+          color: #2d3250;
+          margin-bottom: 6px;
+          display: block;
+          letter-spacing: 0.02em;
+        }
+        .lf-btn-cta {
+          width: 100%;
+          padding: 13px;
+          border-radius: 12px;
+          font-size: 13px;
+          font-family: 'Raleway', sans-serif;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          color: #ffffff;
+          background: #2a6b6e;
+          border: 1px solid rgba(91,158,160,0.4);
+          box-shadow: 0 4px 20px rgba(42,107,110,0.25);
+          cursor: pointer;
+          touch-action: manipulation;
+          transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+          position: relative;
+          overflow: hidden;
+        }
+        .lf-btn-cta:hover:not(:disabled) {
+          background: #235b5e;
+          box-shadow: 0 6px 28px rgba(42,107,110,0.40);
+          transform: translateY(-1px);
+        }
+        .lf-btn-cta:active:not(:disabled) { transform: scale(0.97); }
+        .lf-btn-cta:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .lf-btn-show {
+          position: absolute;
+          right: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 30px;
+          height: 30px;
+          border-radius: 8px;
+          background: #f0f4f8;
+          border: 1px solid #b0cfd0;
+          color: #5b7a8a;
+          cursor: pointer;
+          touch-action: manipulation;
+          transition: background 0.15s, color 0.15s;
+        }
+        .lf-btn-show:hover { background: #e0ecee; color: #2a6b6e; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .lf-spinner {
+          width: 15px; height: 15px;
+          border: 2px solid rgba(255,255,255,0.35);
+          border-top-color: #fff;
+          border-radius: 50%;
+          animation: spin 0.7s linear infinite;
+          flex-shrink: 0;
+        }
+      `}</style>
 
       {/* Error */}
       {error && (
         <div
           role="alert"
-          className="rounded-xl px-3 py-2.5 text-sm"
           style={{
+            borderRadius: 10,
+            padding: "10px 14px",
             background: "#fee2e2",
             color: "#b91c1c",
             border: "1px solid rgba(185,28,28,0.15)",
+            fontFamily: "'Raleway', sans-serif",
+            fontSize: 13,
           }}
         >
           {error}
@@ -34,10 +120,8 @@ export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotP
       )}
 
       {/* Email */}
-      <div className="space-y-1.5">
-        <label className="text-[#0F2044] text-[13px] font-semibold">
-          Email
-        </label>
+      <div>
+        <label className="lf-label">Email</label>
         <input
           type="email"
           value={email}
@@ -45,30 +129,14 @@ export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotP
           placeholder="tu@email.com"
           autoComplete="email"
           required
-          className="
-            w-full rounded-xl
-            px-3 py-2.5
-            text-[#0F2044] text-[13px]
-            placeholder:text-[#4A5A7A]/50
-            outline-none
-            transition duration-150
-            focus:ring-2 focus:ring-[#0EA5A0]/40
-          "
-          style={{
-            background: "#ffffff",
-            border: "1px solid #C8D4EE",
-          }}
-          onFocus={e => e.target.style.borderColor = "#0EA5A0"}
-          onBlur={e => e.target.style.borderColor = "#C8D4EE"}
+          className="lf-input"
         />
       </div>
 
       {/* Password */}
-      <div className="space-y-1.5">
-        <label className="text-[#0F2044] text-[13px] font-semibold">
-          Contraseña
-        </label>
-        <div className="relative">
+      <div>
+        <label className="lf-label">Contraseña</label>
+        <div style={{ position:"relative" }}>
           <input
             type={showPassword ? "text" : "password"}
             value={password}
@@ -76,58 +144,39 @@ export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotP
             placeholder="••••••••"
             autoComplete="current-password"
             required
-            className="
-              w-full rounded-xl
-              px-3 py-2.5 pr-20
-              text-[#0F2044] text-[13px]
-              placeholder:text-[#4A5A7A]/50
-              outline-none
-              transition duration-150
-              focus:ring-2 focus:ring-[#0EA5A0]/40
-            "
-            style={{
-              background: "#ffffff",
-              border: "1px solid #C8D4EE",
-            }}
-            onFocus={e => e.target.style.borderColor = "#0EA5A0"}
-            onBlur={e => e.target.style.borderColor = "#C8D4EE"}
+            className="lf-input"
+            style={{ paddingRight: 48 }}
           />
           <button
             type="button"
             onClick={() => setShowPassword(v => !v)}
             aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-            className="
-              absolute right-2 top-1/2 -translate-y-1/2
-              px-2.5 py-1 rounded-lg
-              text-[#4A5A7A] text-[11px] font-semibold
-              transition-colors duration-150
-              focus:outline-none focus-visible:ring-2
-              focus-visible:ring-[#0EA5A0]
-            "
-            style={{
-              background: "#F0F4FF",
-              border: "1px solid #C8D4EE",
-              touchAction: "manipulation",
-            }}
+            className="lf-btn-show"
           >
-            {showPassword ? "Ocultar" : "Ver"}
+            {showPassword ? <FiEyeOff size={14} /> : <FiEye size={14} />}
           </button>
         </div>
       </div>
 
       {/* ¿Olvidaste tu contraseña? */}
-      <div className="flex justify-end">
+      <div style={{ display:"flex", justifyContent:"flex-end", marginTop:-8 }}>
         <button
           type="button"
           onClick={onForgotPassword}
-          className="
-            text-[13px] font-semibold
-            text-[#1A4DB5] hover:text-[#0EA5A0]
-            transition-colors duration-150
-            focus:outline-none focus-visible:ring-2
-            focus-visible:ring-[#0EA5A0] rounded-sm
-          "
-          style={{ touchAction: "manipulation" }}
+          style={{
+            background: "none",
+            border: "none",
+            fontFamily: "'Raleway', sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            color: "#2a6b6e",
+            cursor: "pointer",
+            touchAction: "manipulation",
+            transition: "color 0.15s",
+            padding: 0,
+          }}
+          onMouseEnter={e => e.currentTarget.style.color = "#5b9ea0"}
+          onMouseLeave={e => e.currentTarget.style.color = "#2a6b6e"}
         >
           ¿Olvidaste tu contraseña?
         </button>
@@ -138,39 +187,10 @@ export default function LoginForm({ onSuccess, onBackHome, onRegister, onForgotP
         type="submit"
         disabled={loading}
         aria-label="Iniciar sesión"
-        className="
-          group relative overflow-hidden
-          w-full rounded-xl
-          px-6 py-[13px]
-          font-semibold text-white
-          text-[13px] tracking-[0.12em]
-          transition-[transform,box-shadow] duration-200 ease-out
-          hover:-translate-y-px
-          active:scale-[0.97]
-          disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none
-          focus:outline-none
-          focus-visible:ring-2
-          focus-visible:ring-[#0EA5A0]
-          focus-visible:ring-offset-2
-          focus-visible:ring-offset-[#F0F4FF]
-        "
-        style={{
-          background: "#1A4DB5",
-          border: "1px solid rgba(26,77,181,0.35)",
-          boxShadow: "0 4px 20px rgba(26,77,181,0.25)",
-          touchAction: "manipulation",
-        }}
-        onMouseEnter={e => !loading && (e.currentTarget.style.boxShadow = "0 6px 28px rgba(26,77,181,0.35)")}
-        onMouseLeave={e => !loading && (e.currentTarget.style.boxShadow = "0 4px 20px rgba(26,77,181,0.25)")}
+        className="lf-btn-cta"
       >
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/10"
-        />
-        <span className="relative z-10 flex items-center justify-center gap-2">
-          {loading && (
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-          )}
+        <span style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+          {loading && <span className="lf-spinner" />}
           {loading ? "Ingresando…" : "INICIAR SESIÓN"}
         </span>
       </button>

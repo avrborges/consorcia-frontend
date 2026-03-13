@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiArrowLeft } from "react-icons/fi";
+import { FiArrowLeft, FiLogIn, FiUserPlus } from "react-icons/fi";
 import logoConsorcia from "../assets/img/consorcia.png";
 import LoginForm from "../features/auth/components/LoginForm";
 
@@ -353,8 +353,8 @@ export default function LoginPage({ onRegister }) {
             }}
           >
             {[
-              { id:"login",    label:"Ingresar"    },
-              { id:"register", label:"Registrarse" },
+              { id:"login",    label:"Ingresar",    Icon: FiLogIn    },
+              { id:"register", label:"Registrarse", Icon: FiUserPlus },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -371,13 +371,13 @@ export default function LoginPage({ onRegister }) {
                   fontSize:13, fontFamily:"'Raleway', sans-serif", fontWeight:600,
                   cursor:"pointer", touchAction:"manipulation",
                   transition:"all 0.2s", outline:"none",
-                  background: activeTab === tab.id ? "#ffffff" : "transparent",
-                  color:      activeTab === tab.id ? "#2d3250" : "rgba(45,50,80,0.4)",
-                  boxShadow:  activeTab === tab.id
-                    ? "0 1px 4px rgba(45,50,80,0.10), inset 0 -2px 0 #5b9ea0"
-                    : "none",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:6,
+                  background: activeTab === tab.id ? "#2a6b6e" : "transparent",
+                  color:      activeTab === tab.id ? "#ffffff" : "rgba(45,50,80,0.4)",
+                  boxShadow:  activeTab === tab.id ? "0 4px 14px rgba(42,107,110,0.30)" : "none",
                 }}
               >
+                <tab.Icon size={13} />
                 {tab.label}
               </button>
             ))}
