@@ -20,7 +20,17 @@ export default function ForgotPasswordPage() {
   const [sent,     setSent]    = useState(false);
   const [error,    setError]   = useState("");
 
-  /* ── Canvas grid ── */
+  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+    setError("");
+    setSending(true);
+    await new Promise(r => setTimeout(r, 900));
+    setSending(false);
+    setSent(true);
+  };
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -51,16 +61,6 @@ export default function ForgotPasswordPage() {
     ro.observe(canvas);
     return () => ro.disconnect();
   }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email) return;
-    setError("");
-    setSending(true);
-    await new Promise(r => setTimeout(r, 900));
-    setSending(false);
-    setSent(true);
-  };
 
   return (
     <main
@@ -368,7 +368,7 @@ export default function ForgotPasswordPage() {
               </div>
 
               {/* CTA */}
-              <button type="submit" disabled={sending} className="fp-btn-cta" style={{ marginTop:4 }}>
+              <button type="submit" disabled={sending || !emailValido} className="fp-btn-cta" style={{ marginTop:4 }}>
                 <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
                   {sending && <span className="fp-spinner" />}
                   {sending ? "Enviando…" : "ENVIAR ENLACE"}
