@@ -1,40 +1,131 @@
-import { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { FiArrowLeft, FiMail, FiCheckCircle } from "react-icons/fi";
 import logoConsorcia from "../assets/img/consorcia.png";
 
 const APP_VERSION = "v1.0.0";
 
-export default function ForgotPasswordPage() {
-  const navigate = useNavigate();
-  const [email, setEmail]   = useState("");
-  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+const SHAPES = [
+  { size: 140, top: "8%",  left: "65%", delay: 0,   dur: 18, opacity: 0.05 },
+  { size: 70,  top: "55%", left: "75%", delay: 3,   dur: 14, opacity: 0.07 },
+  { size: 200, top: "70%", left: "-8%", delay: 6,   dur: 22, opacity: 0.03 },
+  { size: 50,  top: "22%", left: "10%", delay: 1.5, dur: 16, opacity: 0.06 },
+];
 
-  const isValidEmail = (v) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v).toLowerCase());
+export default function ForgotPasswordPage() {
+  const navigate   = useNavigate();
+  const canvasRef  = useRef(null);
+  const [email,    setEmail]   = useState("");
+  const [sending,  setSending] = useState(false);
+  const [sent,     setSent]    = useState(false);
+  const [error,    setError]   = useState("");
+
+  /* ── Canvas grid ── */
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const draw = () => {
+      const W = canvas.offsetWidth;
+      const H = canvas.offsetHeight;
+      canvas.width  = W;
+      canvas.height = H;
+      ctx.clearRect(0, 0, W, H);
+      const STEP = 52;
+      ctx.strokeStyle = "rgba(91,158,160,0.07)";
+      ctx.lineWidth   = 0.8;
+      for (let x = 0; x <= W; x += STEP) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+      for (let y = 0; y <= H; y += STEP) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(91,158,160,0.12)";
+      for (let x = 0; x <= W; x += STEP)
+        for (let y = 0; y <= H; y += STEP) {
+          ctx.beginPath(); ctx.arc(x, y, 1.4, 0, Math.PI * 2); ctx.fill();
+        }
+    };
+    draw();
+    const ro = new ResizeObserver(() => draw());
+    ro.observe(canvas);
+    return () => ro.disconnect();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isValidEmail(email)) { setStatus("error"); return; }
-    setStatus("sending");
-    await new Promise((r) => setTimeout(r, 900));
-    setStatus("sent");
+    if (!email) return;
+    setError("");
+    setSending(true);
+    await new Promise(r => setTimeout(r, 900));
+    setSending(false);
+    setSent(true);
   };
 
   return (
     <main
       className="
-        min-h-screen relative overflow-hidden bg-[#0F2044]
+        min-h-screen relative overflow-hidden
         pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]
-        flex flex-col
-        lg:flex-row
+        flex flex-col lg:flex-row
       "
-      aria-label="Página de recuperación de contraseña"
+      style={{ background: "#1a1f3e", fontFamily: "'Raleway', system-ui, sans-serif" }}
+      aria-label="Recuperar contraseña"
     >
-      {/* Borde interno sutil */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none ring-1 ring-inset ring-white/[0.06]"
-      />
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@700;800&family=Raleway:wght@300;400;500;600;700&display=swap');
+        @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
+        @keyframes fadeUp  { from { opacity:0; transform:translateY(14px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes floatA  { 0%,100% { transform:translateY(0px) rotate(0deg) } 50% { transform:translateY(-20px) rotate(7deg) } }
+        @keyframes floatB  { 0%,100% { transform:translateY(0px) rotate(0deg) } 50% { transform:translateY(16px) rotate(-5deg) } }
+        @keyframes spin    { to { transform:rotate(360deg) } }
+
+        .fp-input {
+          width: 100%; box-sizing: border-box;
+          border-radius: 12px; padding: 11px 14px 11px 40px;
+          font-size: 13px; font-family: 'Raleway', sans-serif; font-weight: 400;
+          color: #2d3250; background: #ffffff;
+          border: 1px solid #b0cfd0; outline: none;
+          transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .fp-input::placeholder { color: rgba(91,122,138,0.45); }
+        .fp-input:focus {
+          border-color: #5b9ea0;
+          box-shadow: 0 0 0 3px rgba(91,158,160,0.15);
+        }
+
+        .fp-btn-cta {
+          width: 100%; padding: 13px;
+          border-radius: 12px;
+          font-size: 13px; font-family: 'Raleway', sans-serif;
+          font-weight: 700; letter-spacing: 0.1em;
+          color: #ffffff; background: #2a6b6e;
+          border: 1px solid rgba(91,158,160,0.4);
+          box-shadow: 0 4px 20px rgba(42,107,110,0.25);
+          cursor: pointer; touch-action: manipulation;
+          transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+        }
+        .fp-btn-cta:hover:not(:disabled) {
+          background: #235b5e;
+          box-shadow: 0 6px 28px rgba(42,107,110,0.40);
+          transform: translateY(-1px);
+        }
+        .fp-btn-cta:active:not(:disabled) { transform: scale(0.97); }
+        .fp-btn-cta:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .fp-spinner {
+          width: 15px; height: 15px;
+          border: 2px solid rgba(255,255,255,0.35);
+          border-top-color: #fff; border-radius: 50%;
+          animation: spin 0.7s linear infinite; flex-shrink: 0;
+        }
+      `}</style>
+
+      {/* Glow blobs */}
+      <div aria-hidden="true" style={{ position:"absolute", inset:0, pointerEvents:"none", overflow:"hidden" }}>
+        <div style={{ position:"absolute", width:500, height:500, top:"-10%", right:"-5%", borderRadius:"50%", background:"radial-gradient(circle, rgba(42,107,110,0.15) 0%, transparent 70%)" }}/>
+        <div style={{ position:"absolute", width:400, height:400, bottom:"-8%", left:"-6%", borderRadius:"50%", background:"radial-gradient(circle, rgba(249,177,122,0.08) 0%, transparent 70%)" }}/>
+      </div>
 
       {/* ══════════════════════════════
           PANEL IZQUIERDO — Branding
@@ -47,101 +138,127 @@ export default function ForgotPasswordPage() {
           lg:items-center lg:justify-center
           lg:px-12 lg:py-12
         "
+        style={{ overflow:"hidden", animation:"fadeIn 0.5s ease forwards" }}
       >
-        {/* Botón volver — solo mobile */}
-        <button
-          type="button"
-          onClick={() => navigate("/login")}
-          aria-label="Volver al login"
-          className="
-            w-9 h-9 rounded-xl self-start
-            flex items-center justify-center
-            transition-colors duration-150
-            focus:outline-none focus-visible:ring-2
-            focus-visible:ring-[#0EA5A0]
-            focus-visible:ring-offset-2
-            focus-visible:ring-offset-[#0F2044]
-            lg:hidden
-          "
-          style={{
-            background: "rgba(255,255,255,0.08)",
-            border: "1px solid rgba(255,255,255,0.10)",
-            touchAction: "manipulation",
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M10 3L5 8L10 13" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
+        {/* Canvas grid */}
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" />
 
-        {/* Branding mobile — logo + título en fila centrada */}
-        <div className="flex items-center justify-center gap-3 mt-6 lg:hidden">
-          <img
-            src={logoConsorcia}
-            alt="Logo CONSORCIA"
-            className="w-12 h-12 select-none flex-shrink-0"
-          />
-          <h1 className="text-white font-extrabold text-[26px] tracking-[0.3em] leading-tight m-0">
-            CONSOR<span className="text-[#F5A623]">CIA</span>
-          </h1>
+        {/* Radial glow blobs */}
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div style={{ position:"absolute", width:400, height:400, top:"-15%", right:"-10%", borderRadius:"50%", background:"radial-gradient(circle, rgba(42,107,110,0.18) 0%, transparent 70%)" }}/>
+          <div style={{ position:"absolute", width:350, height:350, bottom:"-10%", left:"-8%", borderRadius:"50%", background:"radial-gradient(circle, rgba(249,177,122,0.10) 0%, transparent 70%)" }}/>
+          <div style={{ position:"absolute", width:220, height:220, top:"40%", left:"35%", borderRadius:"50%", background:"radial-gradient(circle, rgba(91,158,160,0.08) 0%, transparent 70%)" }}/>
         </div>
 
-        <div className="flex flex-col items-center gap-2 mt-3 lg:hidden">
-          <div
-            aria-hidden="true"
-            className="w-10 h-0.5 rounded-sm"
-            style={{ background: "linear-gradient(90deg, #1A4DB5, #0EA5A0)" }}
-          />
-          <p className="text-white/50 text-[11px] font-light tracking-[0.18em] uppercase text-center m-0">
-            Gestión moderna para tu edificio
-          </p>
-        </div>
+        {/* Floating shapes */}
+        {SHAPES.map((s, i) => (
+          <div key={i} aria-hidden="true" style={{
+            position:"absolute", top:s.top, left:s.left,
+            width:s.size, height:s.size,
+            borderRadius: i % 2 === 0 ? "38% 62% 55% 45% / 45% 38% 62% 55%" : "50%",
+            border:`1px solid rgba(91,158,160,${s.opacity * 1.8})`,
+            background:`rgba(91,158,160,${s.opacity})`,
+            animation:`${i % 2 === 0 ? "floatA" : "floatB"} ${s.dur}s ${s.delay}s ease-in-out infinite`,
+            pointerEvents:"none",
+          }} />
+        ))}
 
-        {/* Branding desktop — centrado en panel */}
-        <div className="hidden lg:flex flex-col items-center text-center gap-6">
-          <img
-            src={logoConsorcia}
-            alt="Logo CONSORCIA"
-            className="w-24 h-24 select-none"
-          />
-          <h1 className="text-white font-extrabold text-[32px] tracking-[0.3em] leading-tight m-0 text-center">
-            CONSOR<span className="text-[#F5A623]">CIA</span>
-          </h1>
-          <div
-            aria-hidden="true"
-            className="w-12 h-0.5 rounded-sm"
-            style={{ background: "linear-gradient(90deg, #1A4DB5, #0EA5A0)" }}
-          />
-          <p className="text-white/50 text-[13px] font-light tracking-wide text-center max-w-[220px] m-0">
-            Gestión moderna para tu edificio
-          </p>
-        </div>
+        {/* Contenido sobre el canvas */}
+        <div style={{ position:"relative", zIndex:1, display:"flex", flexDirection:"column", flex:1, width:"100%" }}>
 
-        {/* Botón volver + versión — solo desktop */}
-        <div className="hidden lg:flex flex-col items-center gap-2 mt-auto">
+          {/* Botón volver — solo mobile */}
           <button
             type="button"
             onClick={() => navigate("/login")}
             aria-label="Volver al login"
-            className="
-              flex items-center gap-2
-              text-white/50 hover:text-white
-              text-[13px] transition-colors duration-150
-              focus:outline-none focus-visible:ring-2
-              focus-visible:ring-[#0EA5A0] rounded-sm
-            "
-            style={{ touchAction: "manipulation" }}
+            className="lg:hidden self-start"
+            style={{
+              display:"inline-flex", alignItems:"center", gap:6,
+              padding:"7px 12px", borderRadius:10,
+              background:"rgba(255,255,255,0.07)",
+              border:"1px solid rgba(255,255,255,0.10)",
+              color:"rgba(240,244,248,0.6)",
+              fontSize:12, fontFamily:"'Raleway', sans-serif", fontWeight:500,
+              cursor:"pointer", touchAction:"manipulation",
+              transition:"background 0.15s, color 0.15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.12)"; e.currentTarget.style.color="#f0f4f8"; }}
+            onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.07)"; e.currentTarget.style.color="rgba(240,244,248,0.6)"; }}
           >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            Volver al login
+            <FiArrowLeft size={14} />
+            Volver
           </button>
-          <p className="text-white/25 text-[11px] tracking-wide m-0">
-            {APP_VERSION}
-          </p>
-        </div>
-      </div>
+
+          {/* Branding mobile */}
+          <div className="flex items-center justify-center gap-3 mt-6 lg:hidden">
+            <img src={logoConsorcia} alt="Logo CONSORCIA" className="w-12 h-12 select-none flex-shrink-0" />
+            <div>
+              <h1 style={{ fontFamily:"'Urbanist', sans-serif", fontWeight:800, fontSize:24, margin:0, color:"#f0f4f8", letterSpacing:"0.15em" }}>
+                CONSOR<span style={{ color:"#f9b17a" }}>CIA</span>
+              </h1>
+              <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:300, margin:"3px 0 0", color:"rgba(240,244,248,0.4)", letterSpacing:"0.15em", textTransform:"uppercase" }}>
+                Gestión moderna
+              </p>
+            </div>
+          </div>
+
+          {/* Branding desktop */}
+          <div className="hidden lg:flex flex-col items-center text-center gap-6">
+            <img src={logoConsorcia} alt="Logo CONSORCIA" className="w-24 h-24 select-none" />
+            <h1 style={{ fontFamily:"'Urbanist', sans-serif", fontWeight:800, fontSize:32, margin:0, color:"#f0f4f8", letterSpacing:"0.2em" }}>
+              CONSOR<span style={{ color:"#f9b17a" }}>CIA</span>
+            </h1>
+            <div style={{ width:48, height:2, borderRadius:2, background:"linear-gradient(90deg, #5b9ea0, #f9b17a)" }} />
+            <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:13, fontWeight:300, margin:0, color:"rgba(240,244,248,0.45)", letterSpacing:"0.06em", maxWidth:200, lineHeight:1.6 }}>
+              Gestión moderna para tu edificio
+            </p>
+          </div>
+
+          {/* Download badges — solo desktop */}
+          <div className="hidden lg:flex flex-col items-center gap-3 mt-8">
+            <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:500, margin:0, color:"rgba(240,244,248,0.25)", letterSpacing:"0.12em", textTransform:"uppercase" }}>
+              Disponible en
+            </p>
+            <div style={{ display:"flex", gap:10 }}>
+              <button type="button" style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:10, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.10)", cursor:"pointer", touchAction:"manipulation", transition:"background 0.18s, border-color 0.18s, transform 0.12s" }}
+                onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.10)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.20)"; e.currentTarget.style.transform="translateY(-1px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.05)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.10)"; e.currentTarget.style.transform="translateY(0)"; }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(240,244,248,0.8)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                <div style={{ textAlign:"left" }}>
+                  <div style={{ fontFamily:"'Raleway', sans-serif", fontSize:8, color:"rgba(240,244,248,0.4)", letterSpacing:"0.06em", lineHeight:1, marginBottom:2 }}>DESCARGAR EN</div>
+                  <div style={{ fontFamily:"'Raleway', sans-serif", fontSize:12, fontWeight:600, color:"rgba(240,244,248,0.85)", lineHeight:1 }}>App Store</div>
+                </div>
+              </button>
+              <button type="button" style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:10, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.10)", cursor:"pointer", touchAction:"manipulation", transition:"background 0.18s, border-color 0.18s, transform 0.12s" }}
+                onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.10)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.20)"; e.currentTarget.style.transform="translateY(-1px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.05)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.10)"; e.currentTarget.style.transform="translateY(0)"; }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M3.18 23.76c.3.16.64.19.96.09L14.86 12 11 8.14 3.18 23.76z" fill="#EA4335"/>
+                  <path d="M20.47 10.28l-2.8-1.6-3.99 3.58 3.99 3.58 2.83-1.62c.81-.46.81-1.48-.03-1.94z" fill="#FBBC04"/>
+                  <path d="M3.18.24C2.84.08 2.46.1 2.14.31L14.86 12 11 15.86 3.18.24z" fill="#34A853"/>
+                  <path d="M2.14.31C1.82.52 1.6.9 1.6 1.4v21.2c0 .5.22.88.54 1.09L14.86 12 2.14.31z" fill="#4285F4"/>
+                </svg>
+                <div style={{ textAlign:"left" }}>
+                  <div style={{ fontFamily:"'Raleway', sans-serif", fontSize:8, color:"rgba(240,244,248,0.4)", letterSpacing:"0.06em", lineHeight:1, marginBottom:2 }}>DISPONIBLE EN</div>
+                  <div style={{ fontFamily:"'Raleway', sans-serif", fontSize:12, fontWeight:600, color:"rgba(240,244,248,0.85)", lineHeight:1 }}>Google Play</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Footer desktop */}
+          <div className="hidden lg:flex flex-col items-center gap-1 mt-auto">
+            <div style={{ display:"flex", alignItems:"center", gap:8, fontFamily:"'Raleway', sans-serif", fontSize:11, color:"rgba(240,244,248,0.2)", letterSpacing:"0.06em" }}>
+              <span>by ARTHEMYSA</span>
+              <span style={{ width:4, height:4, borderRadius:"50%", background:"#5b9ea0", opacity:0.6, display:"inline-block" }}/>
+              <span>{APP_VERSION}</span>
+            </div>
+          </div>
+
+        </div>{/* fin contenido sobre canvas */}
+      </div>{/* fin panel izquierdo */}
 
       {/* ══════════════════════════════
           PANEL DERECHO — Formulario
@@ -149,161 +266,143 @@ export default function ForgotPasswordPage() {
       <div
         className="
           relative z-10 flex-1 flex flex-col
-          px-6 pt-6 pb-8
-          rounded-t-[28px]
-          lg:rounded-none
+          px-6 pt-7 pb-8
+          rounded-t-[28px] lg:rounded-none
           lg:w-[58%] lg:min-h-screen
           lg:items-center lg:justify-center
           lg:px-16 lg:py-12
         "
-        style={{ background: "#F0F4FF" }}
+        style={{
+          background:"#f0f4f8",
+          backgroundImage:"radial-gradient(circle, rgba(42,107,110,0.05) 1px, transparent 1px)",
+          backgroundSize:"24px 24px",
+          animation:"fadeIn 0.5s 0.1s ease both",
+        }}
       >
-        <div className="w-full lg:max-w-[400px] flex flex-col flex-1 lg:flex-none">
+        <div
+          className="w-full lg:max-w-[400px] flex flex-col flex-1 lg:flex-none"
+          style={{ animation:"fadeUp 0.55s 0.2s cubic-bezier(0.22,1,0.36,1) both" }}
+        >
 
-          {/* Encabezado del form */}
-          <div className="mb-6">
-            <h2 className="text-[#0F2044] font-extrabold text-[22px] leading-tight m-0">
-              Recuperar contraseña
+          {/* Encabezado */}
+          <div style={{ marginBottom:28 }}>
+            <h2 style={{ fontFamily:"'Urbanist', sans-serif", fontWeight:800, fontSize:26, color:"#2d3250", margin:"0 0 6px", lineHeight:1.2 }}>
+              Recuperar<br/>
+              <span style={{ color:"#2a6b6e" }}>contraseña</span>
             </h2>
-            <p className="text-[#4A5A7A] text-[13px] mt-2 font-light">
-              Ingresá tu email y te enviaremos instrucciones para restablecer tu contraseña.
+            <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:13, fontWeight:300, color:"#5b7a8a", margin:0 }}>
+              {sent
+                ? "Revisá tu casilla de correo."
+                : "Ingresá tu email y te enviamos un enlace para restablecer tu contraseña."
+              }
             </p>
           </div>
 
-          {/* Formulario */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label className="text-[#0F2044] text-[13px] font-semibold">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => { setEmail(e.target.value); setStatus("idle"); }}
-                placeholder="tu@email.com"
-                required
-                className="
-                  w-full rounded-xl
-                  px-3 py-2.5
-                  text-[#0F2044] text-[13px]
-                  placeholder:text-[#4A5A7A]/50
-                  outline-none
-                  transition duration-150
-                  focus:ring-2 focus:ring-[#0EA5A0]/40
-                "
+          {/* ── Estado: enviado ── */}
+          {sent ? (
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"32px 0", textAlign:"center" }}>
+              <div style={{
+                width:56, height:56, borderRadius:"50%",
+                background:"rgba(42,107,110,0.10)",
+                border:"1px solid rgba(91,158,160,0.25)",
+                display:"flex", alignItems:"center", justifyContent:"center",
+              }}>
+                <FiCheckCircle size={26} color="#2a6b6e" />
+              </div>
+              <div>
+                <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:14, fontWeight:600, color:"#2d3250", margin:"0 0 4px" }}>
+                  ¡Listo! Revisá tu email
+                </p>
+                <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:13, fontWeight:300, color:"#5b7a8a", margin:0 }}>
+                  Si <strong style={{ fontWeight:600 }}>{email}</strong> está registrado, recibirás el enlace en breve.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate("/login")}
                 style={{
-                  background: "#ffffff",
-                  border: "1px solid #C8D4EE",
+                  marginTop:8,
+                  display:"inline-flex", alignItems:"center", gap:6,
+                  background:"none", border:"none",
+                  fontFamily:"'Raleway', sans-serif",
+                  fontSize:13, fontWeight:600,
+                  color:"#2a6b6e", cursor:"pointer",
+                  transition:"color 0.15s", touchAction:"manipulation",
                 }}
-                onFocus={e  => e.target.style.borderColor = "#0EA5A0"}
-                onBlur={e   => e.target.style.borderColor = "#C8D4EE"}
-              />
+                onMouseEnter={e => e.currentTarget.style.color="#5b9ea0"}
+                onMouseLeave={e => e.currentTarget.style.color="#2a6b6e"}
+              >
+                <FiArrowLeft size={13} />
+                Volver al login
+              </button>
             </div>
 
-            {/* Feedback error */}
-            {status === "error" && (
-              <div
-                className="rounded-xl px-3 py-2.5 text-[13px]"
-                role="alert"
-                style={{
-                  background: "#fee2e2",
-                  color: "#b91c1c",
-                  border: "1px solid rgba(185,28,28,0.15)",
-                }}
-              >
-                Ingresá un email válido.
+          ) : (
+            /* ── Estado: formulario ── */
+            <form onSubmit={handleSubmit} style={{ display:"flex", flexDirection:"column", gap:16 }}>
+
+              {/* Error */}
+              {error && (
+                <div role="alert" style={{ borderRadius:10, padding:"10px 14px", background:"#fee2e2", color:"#b91c1c", border:"1px solid rgba(185,28,28,0.15)", fontFamily:"'Raleway', sans-serif", fontSize:13 }}>
+                  {error}
+                </div>
+              )}
+
+              {/* Email */}
+              <div>
+                <label style={{ fontFamily:"'Raleway', sans-serif", fontSize:12, fontWeight:600, color:"#2d3250", marginBottom:6, display:"block", letterSpacing:"0.02em" }}>
+                  Email
+                </label>
+                <div style={{ position:"relative" }}>
+                  <FiMail size={15} style={{ position:"absolute", left:13, top:"50%", transform:"translateY(-50%)", color:"#5b9ea0", pointerEvents:"none" }} />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => { setError(""); setEmail(e.target.value); }}
+                    placeholder="tu@email.com"
+                    autoComplete="email"
+                    required
+                    className="fp-input"
+                  />
+                </div>
               </div>
-            )}
 
-            {/* Feedback enviado */}
-            {status === "sent" && (
-              <div
-                className="rounded-xl px-3 py-2.5 text-[13px]"
-                role="status"
-                style={{
-                  background: "#d0f5f3",
-                  color: "#0EA5A0",
-                  border: "1px solid rgba(14,165,160,0.20)",
-                }}
-              >
-                Si el email existe, te enviaremos instrucciones en breve.
+              {/* CTA */}
+              <button type="submit" disabled={sending} className="fp-btn-cta" style={{ marginTop:4 }}>
+                <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+                  {sending && <span className="fp-spinner" />}
+                  {sending ? "Enviando…" : "ENVIAR ENLACE"}
+                </span>
+              </button>
+
+              {/* Volver */}
+              <div style={{ display:"flex", justifyContent:"center", marginTop:4 }}>
+                <button
+                  type="button"
+                  onClick={() => navigate("/login")}
+                  style={{
+                    background:"none", border:"none",
+                    fontFamily:"'Raleway', sans-serif",
+                    fontSize:12, fontWeight:600,
+                    color:"#5b7a8a", cursor:"pointer",
+                    display:"inline-flex", alignItems:"center", gap:5,
+                    transition:"color 0.15s", touchAction:"manipulation",
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color="#2a6b6e"}
+                  onMouseLeave={e => e.currentTarget.style.color="#5b7a8a"}
+                >
+                  <FiArrowLeft size={12} />
+                  Volver al login
+                </button>
               </div>
-            )}
 
-            {/* Botón CTA */}
-            <button
-              type="submit"
-              disabled={status === "sending" || status === "sent"}
-              aria-label="Enviar instrucciones de recuperación"
-              className="
-                group relative overflow-hidden
-                w-full rounded-xl
-                px-6 py-[13px]
-                font-semibold text-white
-                text-[13px] tracking-[0.12em]
-                transition-[transform,box-shadow] duration-200 ease-out
-                hover:-translate-y-px
-                active:scale-[0.97]
-                disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none
-                focus:outline-none
-                focus-visible:ring-2
-                focus-visible:ring-[#0EA5A0]
-                focus-visible:ring-offset-2
-                focus-visible:ring-offset-[#F0F4FF]
-              "
-              style={{
-                background: "#1A4DB5",
-                border: "1px solid rgba(26,77,181,0.35)",
-                boxShadow: "0 4px 20px rgba(26,77,181,0.25)",
-                touchAction: "manipulation",
-              }}
-              onMouseEnter={e => !["sending","sent"].includes(status) && (e.currentTarget.style.boxShadow = "0 6px 28px rgba(26,77,181,0.35)")}
-              onMouseLeave={e => (e.currentTarget.style.boxShadow = "0 4px 20px rgba(26,77,181,0.25)")}
-            >
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/10"
-              />
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                {status === "sending" && (
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                )}
-                {status === "sending" ? "Enviando…" : "Enviar instrucciones"}
-              </span>
-            </button>
-
-          </form>
-
-          {/* Botón volver — solo mobile */}
-          <button
-            type="button"
-            onClick={() => navigate("/login")}
-            className="
-              lg:hidden
-              flex items-center gap-1.5 mt-6
-              text-[#4A5A7A] hover:text-[#1A4DB5]
-              text-[13px] font-semibold
-              transition-colors duration-150
-              focus:outline-none focus-visible:ring-2
-              focus-visible:ring-[#0EA5A0] rounded-sm
-            "
-            style={{ touchAction: "manipulation" }}
-          >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            Volver al login
-          </button>
+            </form>
+          )}
 
           {/* Footer — solo mobile */}
-          <footer className="lg:hidden text-center mt-6 text-[11px] text-[#4A5A7A]/60 tracking-[0.04em]">
+          <footer className="lg:hidden" style={{ textAlign:"center", marginTop:"auto", paddingTop:24, fontFamily:"'Raleway', sans-serif", fontSize:11, color:"rgba(45,50,80,0.35)", letterSpacing:"0.04em" }}>
             by ARTHEMYSA
-            <span
-              aria-hidden="true"
-              className="inline-block w-1.5 h-1.5 rounded-full bg-[#0EA5A0]/70 mx-1.5 align-middle"
-            />
+            <span style={{ display:"inline-block", width:4, height:4, borderRadius:"50%", background:"#5b9ea0", opacity:0.6, margin:"0 6px", verticalAlign:"middle" }} />
             {APP_VERSION}
           </footer>
 
