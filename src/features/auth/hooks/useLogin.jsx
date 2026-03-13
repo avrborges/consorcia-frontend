@@ -28,6 +28,7 @@ const MOCK_CREDENTIALS = [
   { email: "admin@consorcia.com",   password: "Admin123",   role: "admin",   name: "Administrador"   },
   { email: "council@consorcia.com", password: "Council1",   role: "council", name: "Consejo"         },
   { email: "owner@consorcia.com",   password: "Owner123",   role: "owner",   name: "Propietario"     },
+  { email: "tenant@consorcia.com",  password: "Tenant123",  role: "tenant",  name: "Inquilino"       },
   { email: "error@consorcia.com",   password: "Error123",   role: null,      name: null, forceError: "El servidor no está disponible. Intentá más tarde." },
 ];
 
