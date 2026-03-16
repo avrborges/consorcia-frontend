@@ -11,32 +11,31 @@ const APP_VERSION = "v1.0.0";
 
 /* ── Navegación desktop (sidebar) ── */
 const SIDEBAR_ITEMS = [
-  { id: "dashboard",     label: "Inicio",       icon: FiHome,        path: "/dashboard"     },
-  { id: "expensas",      label: "Expensas",     icon: FiDollarSign,  path: "/expensas"      },
-  { id: "documentos",    label: "Documentos",   icon: FiFileText,    path: "/documentos"    },
-  { id: "mensajes",      label: "Mensajes",     icon: FiMessageSquare, path: "/mensajes"      },
-  { id: "encuestas",     label: "Encuestas",    icon: FiPieChart,     path: "/encuestas"      },
-  { id: "contactos",     label: "Contactos útiles",     icon: FiPhone,     path: "/contactos"     },
-  { id: "configuracion", label: "Configuración", icon: FiSettings,    path: "/configuracion" },
+  { id: "dashboard",     label: "Inicio",             icon: FiHome,          path: "/dashboard"     },
+  { id: "expensas",      label: "Expensas",           icon: FiDollarSign,    path: "/expensas"      },
+  { id: "documentos",    label: "Documentos",         icon: FiFileText,      path: "/documentos"    },
+  { id: "mensajes",      label: "Mensajes",           icon: FiMessageSquare, path: "/mensajes"      },
+  { id: "encuestas",     label: "Encuestas",          icon: FiPieChart,      path: "/encuestas"     },
+  { id: "contactos",     label: "Contactos útiles",   icon: FiPhone,         path: "/contactos"     },
+  { id: "configuracion", label: "Configuración",      icon: FiSettings,      path: "/configuracion" },
 ];
 
 /* ── Navegación mobile (bottom bar) ── */
 const BOTTOM_ITEMS = [
-  { id: "dashboard", label: "Inicio",    icon: FiHome,       path: "/dashboard" },
-  { id: "expensas",  label: "Expensas",  icon: FiDollarSign, path: "/expensas"  },
+  { id: "dashboard", label: "Inicio",    icon: FiHome,          path: "/dashboard" },
+  { id: "expensas",  label: "Expensas",  icon: FiDollarSign,    path: "/expensas"  },
   { id: "mensajes",  label: "Mensajes",  icon: FiMessageSquare, path: "/mensajes"  },
-  { id: "encuestas",  label: "Encuestas", icon: FiPieChart,  path: "/encuestas"  },
+  { id: "encuestas", label: "Encuestas", icon: FiPieChart,      path: "/encuestas" },
 ];
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [collapsed,   setCollapsed]   = useState(false);
-  const [drawerOpen,  setDrawerOpen]  = useState(false);
-  const [notifOpen,   setNotifOpen]   = useState(false);
+  const [collapsed,  setCollapsed]  = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [notifOpen,  setNotifOpen]  = useState(false);
   const notifRef = useRef(null);
 
-  /* Datos de sesión reales */
   const storedUser = getStoredUser();
   const USER = {
     name:     storedUser?.name ?? "Usuario",
@@ -46,7 +45,6 @@ export default function DashboardLayout() {
 
   const handleLogout = () => { logout(); navigate("/login"); };
 
-  /* Cierra notif al hacer click fuera */
   useEffect(() => {
     const handler = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target))
@@ -65,7 +63,6 @@ export default function DashboardLayout() {
         @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@700;800&family=Raleway:wght@300;400;500;600;700&display=swap');
         * { box-sizing: border-box; }
 
-        /* ── Sidebar nav items ── */
         .nav-item {
           display: flex; align-items: center; gap: 10px;
           padding: 9px 12px; border-radius: 10px;
@@ -73,16 +70,14 @@ export default function DashboardLayout() {
           color: rgba(240,244,248,0.55);
           cursor: pointer; border: none; background: transparent;
           width: 100%; transition: background 0.15s, color 0.15s;
-          white-space: nowrap; overflow: hidden;
-          touch-action: manipulation;
+          white-space: nowrap; overflow: hidden; touch-action: manipulation;
         }
-        .nav-item:hover  { background: rgba(255,255,255,0.07); color: rgba(240,244,248,0.85); }
+        .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(240,244,248,0.85); }
         .nav-item.active {
           background: rgba(91,158,160,0.14); color: #8ecfd1;
           border-left: 2px solid #5b9ea0; padding-left: 10px;
         }
 
-        /* Nav items versión mobile (fondo claro) */
         .nav-item-light {
           display: flex; align-items: center; gap: 10px;
           padding: 11px 14px; border-radius: 12px;
@@ -90,16 +85,14 @@ export default function DashboardLayout() {
           color: #2d3250;
           cursor: pointer; border: none; background: transparent;
           width: 100%; transition: background 0.15s, color 0.15s;
-          white-space: nowrap; overflow: hidden;
-          touch-action: manipulation;
+          white-space: nowrap; overflow: hidden; touch-action: manipulation;
         }
-        .nav-item-light:hover  { background: rgba(45,50,80,0.06); }
+        .nav-item-light:hover { background: rgba(45,50,80,0.06); }
         .nav-item-light.active {
           background: rgba(91,158,160,0.12); color: #2a6b6e;
           border-left: 2px solid #5b9ea0; padding-left: 12px; font-weight: 600;
         }
 
-        /* Logout versión mobile (fondo claro) */
         .logout-btn-light {
           display: flex; align-items: center; gap: 8px;
           padding: 11px 14px; border-radius: 12px;
@@ -111,7 +104,6 @@ export default function DashboardLayout() {
         }
         .logout-btn-light:hover { background: rgba(185,28,28,0.07); color: #b91c1c; }
 
-        /* ── Header buttons ── */
         .header-btn {
           display: flex; align-items: center; justify-content: center;
           width: 36px; height: 36px; border-radius: 10px;
@@ -123,7 +115,6 @@ export default function DashboardLayout() {
         }
         .header-btn:hover { background: rgba(255,255,255,0.12); color: #f0f4f8; }
 
-        /* ── Logout sidebar ── */
         .logout-btn {
           display: flex; align-items: center; gap: 8px;
           padding: 9px 12px; border-radius: 10px;
@@ -135,14 +126,12 @@ export default function DashboardLayout() {
         }
         .logout-btn:hover { background: rgba(185,28,28,0.1); color: #fca5a5; }
 
-        /* ── Notif dot ── */
         .notif-dot {
           position: absolute; top: 6px; right: 6px;
           width: 7px; height: 7px; border-radius: 50%;
           background: #f9b17a; border: 1.5px solid #2d3250;
         }
 
-        /* ── Notif panel ── */
         .notif-panel {
           position: absolute; top: calc(100% + 8px); right: 0;
           width: 300px; border-radius: 14px;
@@ -159,7 +148,6 @@ export default function DashboardLayout() {
         .notif-item:last-child { border-bottom: none; }
         .notif-item:hover { background: #f0f4f8; }
 
-        /* ── Bottom nav (mobile) ── */
         .bottom-nav {
           display: flex;
           position: fixed; bottom: 0; left: 0; right: 0;
@@ -177,8 +165,7 @@ export default function DashboardLayout() {
           transition: color 0.15s; padding: 0;
           color: rgba(240,244,248,0.5);
           font-family: 'Raleway', sans-serif; font-size: 10px; font-weight: 600;
-          letter-spacing: 0.03em;
-          position: relative;
+          letter-spacing: 0.03em; position: relative;
         }
         .bottom-nav-item.active { color: #8ecfd1; }
         .bottom-nav-item.active::before {
@@ -191,7 +178,6 @@ export default function DashboardLayout() {
         }
         .bottom-nav-item:not(.active):hover { color: rgba(240,244,248,0.75); }
 
-        /* ── Responsive: sidebar solo desktop, bottom nav solo mobile ── */
         .sidebar-desktop { display: none; }
         .bottom-nav      { display: flex; }
         @media (min-width: 1024px) {
@@ -199,44 +185,33 @@ export default function DashboardLayout() {
           .bottom-nav      { display: none; }
         }
 
-        /* ── Padding inferior del contenido en mobile para no quedar bajo la bottom nav ── */
-        .main-content { padding-bottom: 28px; }
-        @media (max-width: 1023px) {
-          .main-content { padding-bottom: 84px; }
-        }
+        /* padding-bottom manejado inline en el main */
 
-        @keyframes fadeIn    { from { opacity:0 } to { opacity:1 } }
-        @keyframes slideIn   { from { transform:translateX(-100%) } to { transform:translateX(0) } }
-        @keyframes slideInRight { from { transform:translateX(100%) } to { transform:translateX(0) } }
+        @keyframes fadeIn       { from { opacity:0 } to { opacity:1 } }
+        @keyframes slideIn      { from { transform:translateX(-100%) } to { transform:translateX(0) } }
+        @keyframes slideInRight { from { transform:translateX(100%) }  to { transform:translateX(0) } }
 
-        /* Dropdown notif — solo desktop */
         .notif-panel-desktop { display: none; }
         @media (min-width: 1024px) { .notif-panel-desktop { display: block; } }
 
-        /* Sidebar notif — solo mobile */
         .notif-overlay-mobile, .notif-sidebar-mobile { display: flex; }
         @media (min-width: 1024px) {
           .notif-overlay-mobile, .notif-sidebar-mobile { display: none !important; }
         }
+
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(91,158,160,0.25); border-radius: 4px; }
       `}</style>
 
-      {/* ══════════════════════════════════════
-          SIDEBAR — desktop only
-      ══════════════════════════════════════ */}
-      <aside
-        className="sidebar-desktop"
-        style={{
-          width: sidebarW, flexShrink: 0, flexDirection: "column",
-          background: "#2d3250",
-          borderRight: "1px solid rgba(255,255,255,0.06)",
-          transition: "width 0.22s cubic-bezier(0.4,0,0.2,1)",
-          overflow: "hidden", position: "relative", zIndex: 20,
-        }}
-      >
-        {/* Logo */}
+      {/* ══════════ SIDEBAR desktop ══════════ */}
+      <aside className="sidebar-desktop" style={{
+        width: sidebarW, flexShrink: 0, flexDirection: "column",
+        background: "#2d3250",
+        borderRight: "1px solid rgba(255,255,255,0.06)",
+        transition: "width 0.22s cubic-bezier(0.4,0,0.2,1)",
+        overflow: "hidden", position: "relative", zIndex: 20,
+      }}>
         <div style={{
           display:"flex", alignItems:"center",
           gap: collapsed ? 0 : 10,
@@ -254,17 +229,12 @@ export default function DashboardLayout() {
           )}
         </div>
 
-        {/* Nav principal */}
         <nav style={{ flex:1, padding:"12px 8px", display:"flex", flexDirection:"column", gap:2, overflowY:"auto" }}>
           {!collapsed && (
-            <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(240,244,248,0.2)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 8px", padding:"0 8px" }}>
-              Principal
-            </p>
+            <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(240,244,248,0.2)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 8px", padding:"0 8px" }}>Principal</p>
           )}
           {SIDEBAR_ITEMS.filter(i => i.id !== "configuracion").map(item => (
-            <button
-              key={item.id}
-              onClick={() => navigate(item.path)}
+            <button key={item.id} onClick={() => navigate(item.path)}
               className={`nav-item ${isActive(item.path) ? "active" : ""}`}
               title={collapsed ? item.label : undefined}
               style={{ justifyContent: collapsed ? "center" : "flex-start", padding: collapsed ? "9px 0" : undefined }}
@@ -273,18 +243,12 @@ export default function DashboardLayout() {
               {!collapsed && <span>{item.label}</span>}
             </button>
           ))}
-
-          {/* Sistema */}
           <div style={{ marginTop:"auto", paddingTop:8, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
             {!collapsed && (
-              <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(240,244,248,0.2)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 8px", padding:"0 8px" }}>
-                Sistema
-              </p>
+              <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(240,244,248,0.2)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 8px", padding:"0 8px" }}>Sistema</p>
             )}
             {SIDEBAR_ITEMS.filter(i => i.id === "configuracion").map(item => (
-              <button
-                key={item.id}
-                onClick={() => navigate(item.path)}
+              <button key={item.id} onClick={() => navigate(item.path)}
                 className={`nav-item ${isActive(item.path) ? "active" : ""}`}
                 title={collapsed ? item.label : undefined}
                 style={{ justifyContent: collapsed ? "center" : "flex-start", padding: collapsed ? "9px 0" : undefined }}
@@ -293,9 +257,7 @@ export default function DashboardLayout() {
                 {!collapsed && <span>{item.label}</span>}
               </button>
             ))}
-            <button
-              onClick={handleLogout}
-              className="logout-btn"
+            <button onClick={handleLogout} className="logout-btn"
               title={collapsed ? "Cerrar sesión" : undefined}
               style={{ justifyContent: collapsed ? "center" : "flex-start", padding: collapsed ? "9px 0" : undefined }}
             >
@@ -305,7 +267,6 @@ export default function DashboardLayout() {
           </div>
         </nav>
 
-        {/* Versión */}
         {!collapsed && (
           <div style={{ padding:"10px 16px", borderTop:"1px solid rgba(255,255,255,0.06)", fontFamily:"'Raleway', sans-serif", fontSize:10, color:"rgba(240,244,248,0.15)", letterSpacing:"0.08em", textAlign:"center" }}>
             {APP_VERSION}
@@ -313,28 +274,18 @@ export default function DashboardLayout() {
         )}
       </aside>
 
-      {/* ══════════════════════════════════════
-          COLUMNA PRINCIPAL
-      ══════════════════════════════════════ */}
+      {/* ══════════ COLUMNA PRINCIPAL ══════════ */}
       <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", minWidth:0 }}>
 
-        {/* ── HEADER ── */}
         <header style={{
           height: 60, flexShrink:0,
           display:"flex", alignItems:"center", justifyContent:"space-between",
-          padding:"0 16px",
-          background:"#2d3250",
+          padding:"0 16px", background:"#2d3250",
           borderBottom:"1px solid rgba(255,255,255,0.06)",
           zIndex:10, position:"relative",
         }}>
-
-          {/* Izquierda: hamburguesa mobile + hamburguesa desktop */}
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-
-            {/* Hamburguesa — solo mobile, abre drawer */}
-            <button
-              onClick={() => setDrawerOpen(true)}
-              aria-label="Abrir menú"
+            <button onClick={() => setDrawerOpen(true)} aria-label="Abrir menú"
               id="btn-open-drawer-mobile"
               style={{ background:"none", border:"none", padding:4, cursor:"pointer", color:"rgba(240,244,248,0.7)", touchAction:"manipulation", transition:"color 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.color="#f0f4f8"}
@@ -342,88 +293,58 @@ export default function DashboardLayout() {
             >
               <FiMenu size={22} />
             </button>
-            <style>{`
-              @media (min-width: 1024px) { #btn-open-drawer-mobile { display: none !important; } }
-            `}</style>
+            <style>{`@media (min-width: 1024px) { #btn-open-drawer-mobile { display: none !important; } }`}</style>
 
-            {/* Hamburguesa — solo desktop, colapsa sidebar */}
-            <button
-              onClick={() => setCollapsed(v => !v)}
+            <button onClick={() => setCollapsed(v => !v)}
               aria-label={collapsed ? "Expandir sidebar" : "Colapsar sidebar"}
-              style={{ display:"none", background:"none", border:"none", padding:4, cursor:"pointer", color:"rgba(240,244,248,0.6)", touchAction:"manipulation", transition:"color 0.15s" }}
               id="btn-collapse-desktop"
+              style={{ display:"none", background:"none", border:"none", padding:4, cursor:"pointer", color:"rgba(240,244,248,0.6)", touchAction:"manipulation", transition:"color 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.color="#f0f4f8"}
               onMouseLeave={e => e.currentTarget.style.color="rgba(240,244,248,0.6)"}
             >
               <FiMenu size={20} />
             </button>
-            <style>{`
-              @media (min-width: 1024px) { #btn-collapse-desktop { display: flex !important; } }
-            `}</style>
-
+            <style>{`@media (min-width: 1024px) { #btn-collapse-desktop { display: flex !important; } }`}</style>
           </div>
 
-          {/* Centro: logo — solo mobile */}
           <div id="header-logo-mobile" style={{ display:"flex", alignItems:"center", gap:7, position:"absolute", left:"50%", transform:"translateX(-50%)" }}>
             <img src={logoConsorcia} alt="Logo" style={{ width:24, height:24 }} />
             <span style={{ fontFamily:"'Urbanist', sans-serif", fontWeight:800, fontSize:15, color:"#f0f4f8", letterSpacing:"0.12em" }}>
               CONSOR<span style={{ color:"#f9b17a" }}>CIA</span>
             </span>
           </div>
-          <style>{`
-            @media (min-width: 1024px) { #header-logo-mobile { display: none !important; } }
-          `}</style>
+          <style>{`@media (min-width: 1024px) { #header-logo-mobile { display: none !important; } }`}</style>
 
-          {/* Derecha: nombre usuario + notificaciones */}
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-
-            {/* Nombre usuario + avatar — solo desktop */}
             <div id="header-user" style={{ display:"none", alignItems:"center", gap:8 }}>
               <div style={{
                 width:28, height:28, borderRadius:"50%",
                 background:"linear-gradient(135deg, #2a6b6e, #5b9ea0)",
                 display:"flex", alignItems:"center", justifyContent:"center",
                 fontFamily:"'Raleway', sans-serif", fontSize:11, fontWeight:700, color:"#fff", flexShrink:0,
-              }}>
-                {USER.initials}
-              </div>
-              <span style={{ fontFamily:"'Raleway', sans-serif", fontSize:13, fontWeight:500, color:"rgba(240,244,248,0.75)", whiteSpace:"nowrap" }}>
-                {USER.name}
-              </span>
+              }}>{USER.initials}</div>
+              <span style={{ fontFamily:"'Raleway', sans-serif", fontSize:13, fontWeight:500, color:"rgba(240,244,248,0.75)", whiteSpace:"nowrap" }}>{USER.name}</span>
             </div>
-            <style>{`
-              @media (min-width: 1024px) { #header-user { display: flex !important; } }
-            `}</style>
+            <style>{`@media (min-width: 1024px) { #header-user { display: flex !important; } }`}</style>
 
-            {/* Notificaciones */}
             <div style={{ position:"relative" }} ref={notifRef}>
-              <button
-                onClick={() => setNotifOpen(v => !v)}
-                aria-label="Notificaciones"
-                style={{
-                  background:"none", border:"none", padding:6,
-                  cursor:"pointer", color:"rgba(240,244,248,0.7)",
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  position:"relative", touchAction:"manipulation",
-                  transition:"color 0.15s",
-                }}
+              <button onClick={() => setNotifOpen(v => !v)} aria-label="Notificaciones"
+                style={{ background:"none", border:"none", padding:6, cursor:"pointer", color:"rgba(240,244,248,0.7)", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", touchAction:"manipulation", transition:"color 0.15s" }}
                 onMouseEnter={e => e.currentTarget.style.color="#f0f4f8"}
                 onMouseLeave={e => e.currentTarget.style.color="rgba(240,244,248,0.7)"}
               >
                 <FiBell size={22} />
                 <span className="notif-dot" />
               </button>
-
-              {/* Panel desktop — dropdown */}
               {notifOpen && (
                 <div className="notif-panel notif-panel-desktop">
                   <div style={{ padding:"12px 16px 10px", borderBottom:"1px solid rgba(176,207,208,0.3)" }}>
                     <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:12, fontWeight:600, color:"#2d3250", margin:0 }}>Notificaciones</p>
                   </div>
                   {[
-                    { title:"Expensa cargada",  desc:"Mayo 2025 disponible",    time:"hace 2h", dot:"#5b9ea0" },
-                    { title:"Nuevo reclamo",    desc:"Unidad 4B — Filtración",  time:"hace 5h", dot:"#f9b17a" },
-                    { title:"Votación activa",  desc:"Pintura pasillo",          time:"ayer",    dot:"#5b9ea0" },
+                    { title:"Expensa cargada",  desc:"Mayo 2025 disponible",   time:"hace 2h", dot:"#5b9ea0" },
+                    { title:"Nuevo reclamo",    desc:"Unidad 4B — Filtración", time:"hace 5h", dot:"#f9b17a" },
+                    { title:"Votación activa",  desc:"Pintura pasillo",         time:"ayer",    dot:"#5b9ea0" },
                   ].map((n, i) => (
                     <div key={i} className="notif-item">
                       <span style={{ width:8, height:8, borderRadius:"50%", background:n.dot, flexShrink:0, marginTop:5 }} />
@@ -443,78 +364,45 @@ export default function DashboardLayout() {
                 </div>
               )}
             </div>
-
           </div>
         </header>
 
-        {/* ── ÁREA DE CONTENIDO ── */}
-        <main className="main-content" style={{ flex:1, overflowY:"auto", background:"#ffffff", padding:"28px 24px" }}>
+        <main className="main-content" style={{ flex:1, overflowY:"auto", background:"#ffffff", paddingTop:"28px", paddingLeft:"24px", paddingRight:"24px", paddingBottom:"28px" }}>
+          <style>{`.main-content { padding-bottom: 28px; } @media (max-width: 1023px) { .main-content { padding-bottom: 84px !important; } }`}</style>
           <Outlet />
         </main>
-
       </div>
 
-      {/* ══════════════════════════════════════
-          NOTIF SIDEBAR — mobile only
-      ══════════════════════════════════════ */}
+      {/* ══════════ NOTIF SIDEBAR mobile ══════════ */}
       {notifOpen && (
         <>
-          <div
-            onClick={() => setNotifOpen(false)}
-            style={{
-              position:"fixed", inset:0, zIndex:40,
-              background:"rgba(26,31,62,0.55)",
-              backdropFilter:"blur(2px)",
-              animation:"fadeIn 0.2s ease",
-            }}
-            className="notif-overlay-mobile"
+          <div onClick={() => setNotifOpen(false)} className="notif-overlay-mobile"
+            style={{ position:"fixed", inset:0, zIndex:40, background:"rgba(26,31,62,0.55)", backdropFilter:"blur(2px)", animation:"fadeIn 0.2s ease" }}
           />
-          <aside
-            className="notif-sidebar-mobile"
-            style={{
-              position:"fixed", top:0, right:0, bottom:0, zIndex:50,
-              width:"100%", background:"#ffffff",
-              display:"flex", flexDirection:"column",
-              animation:"slideInRight 0.25s cubic-bezier(0.4,0,0.2,1)",
-              boxShadow:"-4px 0 24px rgba(45,50,80,0.12)",
-            }}
-          >
-            {/* Header */}
-            <div style={{
-              display:"flex", alignItems:"center", justifyContent:"space-between",
-              padding:"18px 16px",
-              background:"#2d3250",
-              borderBottom:"1px solid rgba(255,255,255,0.06)",
-              flexShrink:0,
-            }}>
+          <aside className="notif-sidebar-mobile" style={{
+            position:"fixed", top:0, right:0, bottom:0, zIndex:50,
+            width:"100%", background:"#ffffff", display:"flex", flexDirection:"column",
+            animation:"slideInRight 0.25s cubic-bezier(0.4,0,0.2,1)",
+            boxShadow:"-4px 0 24px rgba(45,50,80,0.12)",
+          }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 16px", background:"#2d3250", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                 <FiBell size={16} color="#8ecfd1" />
-                <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:15, fontWeight:700, color:"#f0f4f8", margin:0 }}>
-                  Notificaciones
-                </p>
+                <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:15, fontWeight:700, color:"#f0f4f8", margin:0 }}>Notificaciones</p>
               </div>
-              <button
-                onClick={() => setNotifOpen(false)}
-                aria-label="Cerrar notificaciones"
-                style={{
-                  background:"none", border:"none", padding:6,
-                  cursor:"pointer", color:"rgba(240,244,248,0.5)",
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  touchAction:"manipulation", transition:"color 0.15s",
-                }}
+              <button onClick={() => setNotifOpen(false)} aria-label="Cerrar notificaciones"
+                style={{ background:"none", border:"none", padding:6, cursor:"pointer", color:"rgba(240,244,248,0.5)", display:"flex", alignItems:"center", justifyContent:"center", touchAction:"manipulation", transition:"color 0.15s" }}
                 onMouseEnter={e => e.currentTarget.style.color="#f0f4f8"}
                 onMouseLeave={e => e.currentTarget.style.color="rgba(240,244,248,0.5)"}
               >
                 <FiX size={22} />
               </button>
             </div>
-
-            {/* Lista */}
             <div style={{ flex:1, overflowY:"auto" }}>
               {[
-                { title:"Expensa cargada",  desc:"Mayo 2025 disponible",    time:"hace 2h", dot:"#5b9ea0" },
-                { title:"Nuevo reclamo",    desc:"Unidad 4B — Filtración",  time:"hace 5h", dot:"#f9b17a" },
-                { title:"Votación activa",  desc:"Pintura pasillo",          time:"ayer",    dot:"#5b9ea0" },
+                { title:"Expensa cargada",  desc:"Mayo 2025 disponible",   time:"hace 2h", dot:"#5b9ea0" },
+                { title:"Nuevo reclamo",    desc:"Unidad 4B — Filtración", time:"hace 5h", dot:"#f9b17a" },
+                { title:"Votación activa",  desc:"Pintura pasillo",         time:"ayer",    dot:"#5b9ea0" },
               ].map((n, i) => (
                 <div key={i} className="notif-item" style={{ padding:"16px" }}>
                   <span style={{ width:9, height:9, borderRadius:"50%", background:n.dot, flexShrink:0, marginTop:4 }} />
@@ -526,8 +414,6 @@ export default function DashboardLayout() {
                 </div>
               ))}
             </div>
-
-            {/* Footer */}
             <div style={{ padding:"14px 16px", borderTop:"1px solid rgba(176,207,208,0.3)" }}>
               <button style={{ background:"none", border:"none", fontFamily:"'Raleway', sans-serif", fontSize:13, fontWeight:600, color:"#2a6b6e", cursor:"pointer", padding:0, touchAction:"manipulation", width:"100%", textAlign:"center" }}
                 onMouseEnter={e => e.currentTarget.style.color="#5b9ea0"}
@@ -538,77 +424,39 @@ export default function DashboardLayout() {
         </>
       )}
 
-      {/* ══════════════════════════════════════
-          DRAWER — mobile only
-      ══════════════════════════════════════ */}
+      {/* ══════════ DRAWER mobile ══════════ */}
       {drawerOpen && (
         <>
-          <div
-            onClick={() => setDrawerOpen(false)}
-            style={{
-              position:"fixed", inset:0, zIndex:40,
-              background:"rgba(26,31,62,0.55)",
-              backdropFilter:"blur(2px)",
-              animation:"fadeIn 0.2s ease",
-            }}
+          <div onClick={() => setDrawerOpen(false)}
+            style={{ position:"fixed", inset:0, zIndex:40, background:"rgba(26,31,62,0.55)", backdropFilter:"blur(2px)", animation:"fadeIn 0.2s ease" }}
           />
           <aside style={{
             position:"fixed", top:0, left:0, bottom:0, zIndex:50,
-            width:"100%", background:"#edf2f4",
-            borderRight:"none",
+            width:"100%", background:"#edf2f4", borderRight:"none",
             display:"flex", flexDirection:"column",
             animation:"slideIn 0.22s cubic-bezier(0.4,0,0.2,1)",
           }}>
-            {/* Header — bloque perfil cliqueable */}
             <button
               onClick={() => { navigate("/perfil"); setDrawerOpen(false); }}
-              style={{
-                display:"flex", alignItems:"center", justifyContent:"space-between",
-                padding:"24px 16px 20px",
-                borderBottom:"1px solid rgba(255,255,255,0.06)",
-                background:"#2d3250",
-                border:"none", width:"100%", cursor:"pointer",
-                touchAction:"manipulation",
-                transition:"background 0.15s",
-                textAlign:"left",
-              }}
+              style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"24px 16px 20px", borderBottom:"1px solid rgba(255,255,255,0.06)", background:"#2d3250", border:"none", width:"100%", cursor:"pointer", touchAction:"manipulation", transition:"background 0.15s", textAlign:"left" }}
               onMouseEnter={e => e.currentTarget.style.background="#3a4060"}
               onMouseLeave={e => e.currentTarget.style.background="#2d3250"}
               aria-label="Ir a Mi Perfil"
             >
               <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-                <div style={{
-                  width:48, height:48, borderRadius:"50%",
-                  background:"linear-gradient(135deg, #2a6b6e, #5b9ea0)",
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  fontFamily:"'Raleway', sans-serif", fontSize:16, fontWeight:700,
-                  color:"#fff", flexShrink:0,
-                  boxShadow:"0 4px 14px rgba(42,107,110,0.35)",
-                }}>
+                <div style={{ width:48, height:48, borderRadius:"50%", background:"linear-gradient(135deg, #2a6b6e, #5b9ea0)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Raleway', sans-serif", fontSize:16, fontWeight:700, color:"#fff", flexShrink:0, boxShadow:"0 4px 14px rgba(42,107,110,0.35)" }}>
                   {USER.initials}
                 </div>
                 <div style={{ minWidth:0 }}>
-                  <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:15, fontWeight:700, color:"#f0f4f8", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-                    {USER.name}
-                  </p>
-                  <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:11, fontWeight:400, color:"rgba(240,244,248,0.4)", margin:"2px 0 0", textTransform:"capitalize", letterSpacing:"0.03em" }}>
-                    {USER.role}
-                  </p>
-                  <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:12, fontWeight:600, color:"#8ecfd1", margin:"4px 0 0", letterSpacing:"0.01em" }}>
-                    Mi Perfil &rsaquo;
-                  </p>
+                  <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:15, fontWeight:700, color:"#f0f4f8", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{USER.name}</p>
+                  <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:11, fontWeight:400, color:"rgba(240,244,248,0.4)", margin:"2px 0 0", textTransform:"capitalize", letterSpacing:"0.03em" }}>{USER.role}</p>
+                  <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:12, fontWeight:600, color:"#8ecfd1", margin:"4px 0 0", letterSpacing:"0.01em" }}>Mi Perfil &rsaquo;</p>
                 </div>
               </div>
               <button
                 onClick={e => { e.stopPropagation(); setDrawerOpen(false); }}
                 aria-label="Cerrar menú"
-                style={{
-                  background:"none", border:"none", padding:6,
-                  cursor:"pointer", color:"rgba(240,244,248,0.5)",
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  flexShrink:0, touchAction:"manipulation",
-                  transition:"color 0.15s",
-                }}
+                style={{ background:"none", border:"none", padding:6, cursor:"pointer", color:"rgba(240,244,248,0.5)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, touchAction:"manipulation", transition:"color 0.15s" }}
                 onMouseEnter={e => e.currentTarget.style.color="#f0f4f8"}
                 onMouseLeave={e => e.currentTarget.style.color="rgba(240,244,248,0.5)"}
               >
@@ -642,14 +490,10 @@ export default function DashboardLayout() {
         </>
       )}
 
-      {/* ══════════════════════════════════════
-          BOTTOM NAV — mobile only
-      ══════════════════════════════════════ */}
+      {/* ══════════ BOTTOM NAV mobile ══════════ */}
       <nav className="bottom-nav" aria-label="Navegación principal">
         {BOTTOM_ITEMS.map(item => (
-          <button
-            key={item.id}
-            onClick={() => navigate(item.path)}
+          <button key={item.id} onClick={() => navigate(item.path)}
             className={`bottom-nav-item ${isActive(item.path) ? "active" : ""}`}
             aria-label={item.label}
           >
