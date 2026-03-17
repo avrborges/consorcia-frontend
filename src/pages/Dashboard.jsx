@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getStoredUser } from "../features/auth/hooks/useLogin";
 import {
   FiDollarSign, FiMessageSquare, FiPieChart,
-  FiFileText, FiAlertCircle, FiHome, FiPhone, FiDownload,
+  FiFileText, FiAlertCircle, FiPhone, FiDownload,
 } from "react-icons/fi";
 
 /* ─────────────────────────────────────────
@@ -45,14 +45,6 @@ const MOCK = {
   documentos: [
     { nombre: "Reglamento interno",  fecha: "01/05/2025" },
     { nombre: "Acta reunión abril",  fecha: "15/04/2025" },
-  ],
-  accesosRapidos: [
-    { label: "Expensas",   icon: FiDollarSign,   path: "/expensas"   },
-    { label: "Mensajes",   icon: FiMessageSquare, path: "/mensajes"   },
-    { label: "Documentos", icon: FiFileText,      path: "/documentos" },
-    { label: "Encuestas",  icon: FiPieChart,      path: "/encuestas"  },
-    { label: "Reclamos",   icon: FiAlertCircle,   path: "/reclamos"   },
-    { label: "Contactos",  icon: FiPhone,         path: "/contactos"  },
   ],
 };
 
@@ -265,27 +257,6 @@ function CardDocumentos({ navigate, delay }) {
   );
 }
 
-/* Accesos rápidos — solo admin */
-function CardAccesosRapidos({ navigate, delay }) {
-  return (
-    <SectionCard delay={delay}>
-      <CardHeader icon={FiHome} title="Accesos rápidos" />
-      <div style={{ padding:"14px 20px", display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(120px, 1fr))", gap:10 }}>
-        {MOCK.accesosRapidos.map(a => (
-          <button key={a.label} onClick={() => navigate(a.path)}
-            style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:8, padding:"16px 8px", borderRadius:12, background:"#f0f4f8", border:"1px solid #b0cfd0", cursor:"pointer", touchAction:"manipulation", transition:"background 0.15s, border-color 0.15s", fontFamily:"'Raleway', sans-serif", fontSize:12, fontWeight:600, color:"#2d3250" }}
-            onMouseEnter={e => { e.currentTarget.style.background="rgba(91,158,160,0.10)"; e.currentTarget.style.borderColor="#5b9ea0"; }}
-            onMouseLeave={e => { e.currentTarget.style.background="#f0f4f8"; e.currentTarget.style.borderColor="#b0cfd0"; }}
-          >
-            <a.icon size={20} color="#5b9ea0" />
-            {a.label}
-          </button>
-        ))}
-      </div>
-    </SectionCard>
-  );
-}
-
 /* ─────────────────────────────────────────
    Componente principal
 ───────────────────────────────────────── */
@@ -351,6 +322,7 @@ export default function Dashboard() {
 
       {/* ── Consejo ── */}
       {role === "council" && <>
+        <CardExpensaGlobal   navigate={navigate} />
         <CardExpensaPersonal navigate={navigate} />
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))", gap:16 }}>
           <CardReclamos navigate={navigate} delay={0.2} />
@@ -373,7 +345,6 @@ export default function Dashboard() {
           <CardEncuesta   navigate={navigate} delay={0.3} />
           <CardDocumentos navigate={navigate} delay={0.35} />
         </div>
-        <CardAccesosRapidos navigate={navigate} delay={0.4} />
       </>}
 
       {/* Espaciado final — evita que el bottom nav tape el último elemento */}
