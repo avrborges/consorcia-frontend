@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useMemo, useState } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { getStoredUser } from "../features/auth/hooks/useLogin";
 import {
   FiDollarSign, FiMessageSquare, FiPieChart,
@@ -31,21 +31,41 @@ const ROLE_LABELS = {
 
 /* ─────────────────────────────────────────
    Mock data — reemplazar por API
+   Indexado por consorcioId para simular
+   datos distintos por consorcio
 ───────────────────────────────────────── */
-const MOCK = {
-  expensa: {
-    periodo: "Mayo 2025", monto: 42500,
-    vencimiento: "10/06/2025", estado: "pendiente",
-    // Para admin — resumen global
-    totalUnidades: 24, pagas: 18, pendientes: 5, vencidas: 1,
-  },
-  mensajes:   { sinLeer: 3 },
-  reclamos:   { abiertos: 5 },
-  encuesta:   { titulo: "Pintura del pasillo", vence: "20/06/2025", participantes: 8 },
-  documentos: [
-    { nombre: "Reglamento interno",  fecha: "01/05/2025" },
-    { nombre: "Acta reunión abril",  fecha: "15/04/2025" },
+
+const MOCK_UNIDADES = {
+  c1: [
+    { id:"3b", label:"Unidad 3B", expensa:{ periodo:"Mayo 2025", monto:42500, vencimiento:"10/06/2025", estado:"pendiente" } },
+    { id:"7a", label:"Unidad 7A", expensa:{ periodo:"Mayo 2025", monto:38000, vencimiento:"10/06/2025", estado:"pago"      } },
   ],
+  c2: [
+    { id:"2c", label:"Unidad 2C", expensa:{ periodo:"Mayo 2025", monto:55000, vencimiento:"15/06/2025", estado:"vencido"   } },
+  ],
+};
+
+const MOCK_DATA = {
+  c1: {
+    expensa:   { periodo:"Mayo 2025", monto:42500, vencimiento:"10/06/2025", estado:"pendiente", totalUnidades:24, pagas:18, pendientes:5, vencidas:1 },
+    mensajes:  { sinLeer: 3 },
+    reclamos:  { abiertos: 5 },
+    encuesta:  { titulo:"Pintura del pasillo",  vence:"20/06/2025", participantes:8  },
+    documentos:[
+      { nombre:"Reglamento interno", fecha:"01/05/2025" },
+      { nombre:"Acta reunión abril", fecha:"15/04/2025" },
+    ],
+  },
+  c2: {
+    expensa:   { periodo:"Mayo 2025", monto:55000, vencimiento:"15/06/2025", estado:"vencido", totalUnidades:12, pagas:8, pendientes:2, vencidas:2 },
+    mensajes:  { sinLeer: 7 },
+    reclamos:  { abiertos: 2 },
+    encuesta:  { titulo:"Reglamento uso del SUM", vence:"25/06/2025", participantes:5 },
+    documentos:[
+      { nombre:"Acta asamblea mayo",  fecha:"10/05/2025" },
+      { nombre:"Presupuesto 2025",    fecha:"02/01/2025" },
+    ],
+  },
 };
 
 const ESTADO_CONFIG = {
@@ -90,8 +110,8 @@ function CardHeader({ icon: Icon, title, right }) {
 }
 
 /* Expensa — vista propietario / inquilino */
-function CardExpensaPersonal({ navigate }) {
-  const e = MOCK.expensa;
+function CardExpensaPersonal({ navigate, expensa: expensaProp, data }) {
+  const e = expensaProp ?? data?.expensa;
   const estado = ESTADO_CONFIG[e.estado];
   const monto = new Intl.NumberFormat("es-AR", { style:"currency", currency:"ARS", maximumFractionDigits:0 }).format(e.monto);
   return (
@@ -120,8 +140,8 @@ function CardExpensaPersonal({ navigate }) {
 }
 
 /* Expensa — vista admin (resumen global) */
-function CardExpensaGlobal({ navigate }) {
-  const e = MOCK.expensa;
+function CardExpensaGlobal({ navigate, data }) {
+  const e = data?.expensa;
   const total = e.pagas + e.pendientes + e.vencidas;
   const pct   = Math.round((e.pagas / total) * 100);
   return (
@@ -157,8 +177,8 @@ function CardExpensaGlobal({ navigate }) {
 }
 
 /* Mensajes sin leer */
-function CardMensajes({ navigate, delay }) {
-  const { sinLeer } = MOCK.mensajes;
+function CardMensajes({ navigate, delay, data }) {
+  const { sinLeer } = data?.mensajes;
   return (
     <SectionCard delay={delay}>
       <CardHeader icon={FiMessageSquare} title="Mensajes" />
@@ -179,8 +199,8 @@ function CardMensajes({ navigate, delay }) {
 }
 
 /* Reclamos abiertos */
-function CardReclamos({ navigate, delay }) {
-  const { abiertos } = MOCK.reclamos;
+function CardReclamos({ navigate, delay, data }) {
+  const { abiertos } = data?.reclamos;
   return (
     <SectionCard delay={delay}>
       <CardHeader icon={FiAlertCircle} title="Reclamos" />
@@ -201,8 +221,8 @@ function CardReclamos({ navigate, delay }) {
 }
 
 /* Encuesta activa */
-function CardEncuesta({ navigate, delay }) {
-  const { titulo, vence, participantes } = MOCK.encuesta;
+function CardEncuesta({ navigate, delay, data }) {
+  const { titulo, vence, participantes } = data?.encuesta;
   return (
     <SectionCard delay={delay}>
       <CardHeader icon={FiPieChart} title="Encuesta activa" />
@@ -218,16 +238,16 @@ function CardEncuesta({ navigate, delay }) {
 }
 
 /* Documentos recientes */
-function CardDocumentos({ navigate, delay }) {
+function CardDocumentos({ navigate, delay, data }) {
   return (
     <SectionCard delay={delay}>
       <CardHeader icon={FiFileText} title="Documentos recientes" />
       <div>
-        {MOCK.documentos.map((doc, i) => (
+        {data?.documentos.map((doc, i) => (
           <div key={i} style={{
             display:"flex", alignItems:"center", justifyContent:"space-between",
             padding:"11px 20px",
-            borderBottom: i < MOCK.documentos.length - 1 ? "1px solid rgba(176,207,208,0.3)" : "none",
+            borderBottom: i < data?.documentos.length - 1 ? "1px solid rgba(176,207,208,0.3)" : "none",
           }}>
             <div style={{ display:"flex", alignItems:"center", gap:8, minWidth:0 }}>
               <FiFileText size={13} color="#5b9ea0" style={{ flexShrink:0 }} />
@@ -262,12 +282,22 @@ function CardDocumentos({ navigate, delay }) {
 ───────────────────────────────────────── */
 export default function Dashboard() {
   const navigate      = useNavigate();
+  const { consorcioId = "c1" } = useOutletContext() ?? {};
   const storedUser    = getStoredUser();
   const name          = storedUser?.name ?? "Usuario";
   const role          = storedUser?.role ?? "owner";
   const greeting      = useMemo(() => getGreeting(), []);
   const date          = useMemo(() => getFormattedDate(), []);
   const dateFormatted = date.charAt(0).toUpperCase() + date.slice(1);
+
+  /* Datos del consorcio activo */
+  const data     = MOCK_DATA[consorcioId] ?? MOCK_DATA["c1"];
+  const unidades = MOCK_UNIDADES[consorcioId] ?? [];
+
+  /* Selector de unidad — solo para owner con múltiples unidades */
+  const [unidadId, setUnidadId] = useState(unidades[0]?.id ?? null);
+  const unidadActual = unidades.find(u => u.id === unidadId) ?? unidades[0];
+  const tieneMultipleUnidades = role === "owner" && unidades.length > 1;
 
   return (
     <div style={{ minHeight:"100%", fontFamily:"'Raleway', sans-serif", display:"flex", flexDirection:"column", gap:16 }}>
@@ -284,6 +314,20 @@ export default function Dashboard() {
           transition: background 0.15s; white-space: nowrap; flex-shrink: 0;
         }
         .dash-cta:hover { background: #235b5e; }
+        .unidad-tab {
+          padding: 6px 14px; border-radius: 8px; border: none;
+          font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 600;
+          cursor: pointer; touch-action: manipulation; transition: all 0.18s;
+          white-space: nowrap;
+        }
+        .unidad-tab.active {
+          background: #2a6b6e; color: #ffffff;
+          box-shadow: 0 2px 8px rgba(42,107,110,0.25);
+        }
+        .unidad-tab:not(.active) {
+          background: transparent; color: rgba(45,50,80,0.45);
+        }
+        .unidad-tab:not(.active):hover { background: rgba(91,158,160,0.08); color: #2a6b6e; }
       `}</style>
 
       {/* ── Banner bienvenida — todos los roles ── */}
@@ -311,39 +355,57 @@ export default function Dashboard() {
 
       {/* ── Propietario ── */}
       {role === "owner" && <>
-        <CardExpensaPersonal navigate={navigate} />
+        {tieneMultipleUnidades && (
+          <div style={{ background:"#ffffff", border:"1px solid #b0cfd0", borderRadius:14, padding:"12px 16px", boxShadow:"0 2px 8px rgba(45,50,80,0.06)", display:"flex", alignItems:"center", gap:12, flexWrap:"wrap", animation:"fadeUp 0.35s 0.05s cubic-bezier(0.22,1,0.36,1) both" }}>
+            <span style={{ fontFamily:"'Raleway',sans-serif", fontSize:12, fontWeight:600, color:"#5b7a8a", whiteSpace:"nowrap", letterSpacing:"0.03em" }}>Unidad:</span>
+            <div style={{ display:"flex", gap:6, flexWrap:"wrap", background:"rgba(45,50,80,0.04)", borderRadius:10, padding:4 }}>
+              {unidades.map(u => (
+                <button key={u.id} className={`unidad-tab ${u.id === unidadId ? "active" : ""}`} onClick={() => setUnidadId(u.id)}>{u.label}</button>
+              ))}
+            </div>
+          </div>
+        )}
+        <CardExpensaPersonal navigate={navigate} expensa={unidadActual?.expensa} data={data} />
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))", gap:16 }}>
+          <CardReclamos navigate={navigate} delay={0.2} data={data} />
+          <CardMensajes navigate={navigate} delay={0.25} data={data} />
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))", gap:16 }}>
+          <CardEncuesta   navigate={navigate} delay={0.3}  data={data} />
+          <CardDocumentos navigate={navigate} delay={0.35} data={data} />
+        </div>
       </>}
 
       {/* ── Inquilino ── */}
       {role === "tenant" && <>
-        <CardExpensaPersonal navigate={navigate} />
-        <CardMensajes navigate={navigate} delay={0.2} />
+        <CardExpensaPersonal navigate={navigate} data={data} />
+        <CardMensajes navigate={navigate} delay={0.2} data={data} />
       </>}
 
       {/* ── Consejo ── */}
       {role === "council" && <>
-        <CardExpensaGlobal   navigate={navigate} />
-        <CardExpensaPersonal navigate={navigate} />
+        <CardExpensaGlobal   navigate={navigate} data={data} />
+        <CardExpensaPersonal navigate={navigate} data={data} />
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))", gap:16 }}>
-          <CardReclamos navigate={navigate} delay={0.2} />
-          <CardMensajes navigate={navigate} delay={0.25} />
+          <CardReclamos navigate={navigate} delay={0.2}  data={data} />
+          <CardMensajes navigate={navigate} delay={0.25} data={data} />
         </div>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))", gap:16 }}>
-          <CardEncuesta   navigate={navigate} delay={0.3} />
-          <CardDocumentos navigate={navigate} delay={0.35} />
+          <CardEncuesta   navigate={navigate} delay={0.3}  data={data} />
+          <CardDocumentos navigate={navigate} delay={0.35} data={data} />
         </div>
       </>}
 
       {/* ── Administración ── */}
       {role === "admin" && <>
-        <CardExpensaGlobal  navigate={navigate} />
+        <CardExpensaGlobal  navigate={navigate} data={data} />
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))", gap:16 }}>
-          <CardReclamos navigate={navigate} delay={0.2} />
-          <CardMensajes navigate={navigate} delay={0.25} />
+          <CardReclamos navigate={navigate} delay={0.2}  data={data} />
+          <CardMensajes navigate={navigate} delay={0.25} data={data} />
         </div>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))", gap:16 }}>
-          <CardEncuesta   navigate={navigate} delay={0.3} />
-          <CardDocumentos navigate={navigate} delay={0.35} />
+          <CardEncuesta   navigate={navigate} delay={0.3}  data={data} />
+          <CardDocumentos navigate={navigate} delay={0.35} data={data} />
         </div>
       </>}
 

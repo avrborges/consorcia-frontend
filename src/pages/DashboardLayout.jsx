@@ -28,13 +28,25 @@ const BOTTOM_ITEMS = [
   { id: "encuestas", label: "Encuestas", icon: FiPieChart,      path: "/encuestas" },
 ];
 
+/* ── Mock consorcios del usuario — reemplazar por API ── */
+const MOCK_CONSORCIOS = [
+  { id: "c1", nombre: "Edificio Las Acacias", direccion: "Av. Corrientes 1234" },
+  { id: "c2", nombre: "Torre San Martín",     direccion: "San Martín 567"       },
+];
+
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [collapsed,  setCollapsed]  = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [notifOpen,  setNotifOpen]  = useState(false);
-  const notifRef = useRef(null);
+  const [collapsed,    setCollapsed]    = useState(false);
+  const [drawerOpen,   setDrawerOpen]   = useState(false);
+  const [notifOpen,    setNotifOpen]    = useState(false);
+  const [consorcioId,  setConsorcioId]  = useState(MOCK_CONSORCIOS[0].id);
+  const [consorcioOpen, setConsorcioOpen] = useState(false);
+  const notifRef     = useRef(null);
+  const consorcioRef = useRef(null);
+
+  const consorcioActual = MOCK_CONSORCIOS.find(c => c.id === consorcioId) ?? MOCK_CONSORCIOS[0];
+  const tieneMultipleConsorcios = MOCK_CONSORCIOS.length > 1;
 
   const storedUser = getStoredUser();
   const USER = {
@@ -49,6 +61,8 @@ export default function DashboardLayout() {
     const handler = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target))
         setNotifOpen(false);
+      if (consorcioRef.current && !consorcioRef.current.contains(e.target))
+        setConsorcioOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -199,7 +213,25 @@ export default function DashboardLayout() {
           .notif-overlay-mobile, .notif-sidebar-mobile { display: none !important; }
         }
 
-        ::-webkit-scrollbar { width: 4px; }
+        .consorcio-dropdown {
+          position: absolute; top: calc(100% + 8px); left: 50%;
+          transform: translateX(-50%);
+          min-width: 220px; border-radius: 12px;
+          background: #ffffff; border: 1px solid #b0cfd0;
+          box-shadow: 0 8px 24px rgba(45,50,80,0.12);
+          z-index: 100; overflow: hidden;
+          animation: fadeIn 0.15s ease;
+        }
+        .consorcio-option {
+          display: flex; flex-direction: column;
+          padding: 11px 16px; cursor: pointer;
+          border-bottom: 1px solid rgba(176,207,208,0.3);
+          transition: background 0.12s;
+          position: relative;
+        }
+        .consorcio-option:last-child { border-bottom: none; }
+        .consorcio-option:hover { background: #f0f4f8; }
+        .consorcio-option.selected { background: rgba(91,158,160,0.07); }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(91,158,160,0.25); border-radius: 4px; }
       `}</style>
@@ -307,13 +339,65 @@ export default function DashboardLayout() {
             <style>{`@media (min-width: 1024px) { #btn-collapse-desktop { display: flex !important; } }`}</style>
           </div>
 
-          <div id="header-logo-mobile" style={{ display:"flex", alignItems:"center", gap:7, position:"absolute", left:"50%", transform:"translateX(-50%)" }}>
-            <img src={logoConsorcia} alt="Logo" style={{ width:24, height:24 }} />
-            <span style={{ fontFamily:"'Urbanist', sans-serif", fontWeight:800, fontSize:15, color:"#f0f4f8", letterSpacing:"0.12em" }}>
-              CONSOR<span style={{ color:"#f9b17a" }}>CIA</span>
-            </span>
+          {/* Centro: selector de consorcio (ambos) */}
+          <div ref={consorcioRef} style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", zIndex:20 }}>
+            <button
+              onClick={() => tieneMultipleConsorcios && setConsorcioOpen(v => !v)}
+              style={{
+                display:"flex", alignItems:"center", gap:6,
+                background: tieneMultipleConsorcios ? "rgba(255,255,255,0.08)" : "transparent",
+                border: tieneMultipleConsorcios ? "1px solid rgba(255,255,255,0.10)" : "none",
+                borderRadius:10, padding: tieneMultipleConsorcios ? "5px 10px 5px 12px" : "5px 4px",
+                cursor: tieneMultipleConsorcios ? "pointer" : "default",
+                touchAction:"manipulation", transition:"background 0.15s",
+              }}
+              onMouseEnter={e => tieneMultipleConsorcios && (e.currentTarget.style.background="rgba(255,255,255,0.12)")}
+              onMouseLeave={e => tieneMultipleConsorcios && (e.currentTarget.style.background="rgba(255,255,255,0.08)")}
+              aria-label="Seleccionar consorcio"
+            >
+              <div style={{ textAlign:"center" }}>
+                <p style={{ fontFamily:"'Raleway',sans-serif", fontSize:10, fontWeight:300, color:"rgba(240,244,248,0.35)", margin:0, letterSpacing:"0.04em", lineHeight:1, marginBottom:2 }}>
+                  Consorcio activo
+                </p>
+                <p style={{ fontFamily:"'Urbanist',sans-serif", fontSize:14, fontWeight:800, color:"#f0f4f8", margin:0, letterSpacing:"0.06em", whiteSpace:"nowrap" }}>
+                  {consorcioActual.nombre}
+                </p>
+              </div>
+              {tieneMultipleConsorcios && (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(240,244,248,0.4)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: consorcioOpen ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 0.2s", flexShrink:0 }}>
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              )}
+            </button>
+
+            {/* Dropdown */}
+            {consorcioOpen && tieneMultipleConsorcios && (
+              <div className="consorcio-dropdown">
+                <div style={{ padding:"10px 16px 8px", borderBottom:"1px solid rgba(176,207,208,0.3)" }}>
+                  <p style={{ fontFamily:"'Raleway',sans-serif", fontSize:11, fontWeight:600, color:"#5b7a8a", margin:0, letterSpacing:"0.04em" }}>
+                    Mis consorcios
+                  </p>
+                </div>
+                {MOCK_CONSORCIOS.map(c => (
+                  <div
+                    key={c.id}
+                    className={`consorcio-option ${c.id === consorcioId ? "selected" : ""}`}
+                    onClick={() => { setConsorcioId(c.id); setConsorcioOpen(false); }}
+                  >
+                    <span style={{ fontFamily:"'Raleway',sans-serif", fontSize:13, fontWeight:600, color:"#2d3250" }}>
+                      {c.nombre}
+                    </span>
+                    <span style={{ fontFamily:"'Raleway',sans-serif", fontSize:11, color:"#5b7a8a", marginTop:2 }}>
+                      {c.direccion}
+                    </span>
+                    {c.id === consorcioId && (
+                      <span style={{ position:"absolute", right:14, top:"50%", transform:"translateY(-50%)", width:7, height:7, borderRadius:"50%", background:"#2a6b6e" }} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <style>{`@media (min-width: 1024px) { #header-logo-mobile { display: none !important; } }`}</style>
 
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
             <div id="header-user" style={{ display:"none", alignItems:"center", gap:8 }}>
@@ -369,7 +453,7 @@ export default function DashboardLayout() {
 
         <main className="main-content" style={{ flex:1, overflowY:"auto", background:"#ffffff", paddingTop:"28px", paddingLeft:"24px", paddingRight:"24px", paddingBottom:"28px" }}>
           <style>{`.main-content { padding-bottom: 28px; } @media (max-width: 1023px) { .main-content { padding-bottom: 84px !important; } }`}</style>
-          <Outlet />
+          <Outlet context={{ consorcioId }} />
         </main>
       </div>
 
