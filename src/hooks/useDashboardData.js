@@ -33,15 +33,42 @@ const MOCK_DATA = {
       { nombre: "Presupuesto 2025",   fecha: "02/01/2025" },
     ],
   },
+  c3: {
+    expensa: {
+      periodo: "Mayo 2025", monto: 31000,
+      vencimiento: "05/06/2025", estado: "pago",
+      totalUnidades: 8, pagas: 7, pendientes: 1, vencidas: 0,
+    },
+    mensajes:  { sinLeer: 1 },
+    reclamos:  { abiertos: 0 },
+    encuesta:  { titulo: "Elección de administrador", vence: "30/06/2025", participantes: 3 },
+    documentos: [
+      { nombre: "Reglamento de copropiedad", fecha: "15/03/2025" },
+      { nombre: "Acta reunión marzo",        fecha: "20/03/2025" },
+    ],
+  },
 };
 
 const MOCK_UNIDADES = {
+  // Consorcio c1 — Edificio Las Acacias
+  // Juan Pérez (owner): 3B y 7A
+  // Laura Martínez (owner2): ninguna en c1
   c1: [
-    { id: "3b", label: "Unidad 3B", expensa: { periodo: "Mayo 2025", monto: 42500, vencimiento: "10/06/2025", estado: "pendiente" } },
-    { id: "7a", label: "Unidad 7A", expensa: { periodo: "Mayo 2025", monto: 38000, vencimiento: "10/06/2025", estado: "pago"      } },
+    { id:"3b", label:"Unidad 3B", userId:"owner@consorcia.com",  expensa:{ periodo:"Mayo 2025", monto:42500, vencimiento:"10/06/2025", estado:"pendiente" } },
+    { id:"7a", label:"Unidad 7A", userId:"owner@consorcia.com",  expensa:{ periodo:"Mayo 2025", monto:38000, vencimiento:"10/06/2025", estado:"pago"      } },
+    { id:"2c", label:"Unidad 2C", userId:"other",                expensa:{ periodo:"Mayo 2025", monto:41000, vencimiento:"10/06/2025", estado:"pago"      } },
   ],
+  // Consorcio c2 — Torre San Martín
+  // Juan Pérez (owner): 5D
+  // Laura Martínez (owner2): ninguna en c2
   c2: [
-    { id: "2c", label: "Unidad 2C", expensa: { periodo: "Mayo 2025", monto: 55000, vencimiento: "15/06/2025", estado: "vencido"   } },
+    { id:"5d", label:"Unidad 5D", userId:"owner@consorcia.com",  expensa:{ periodo:"Mayo 2025", monto:55000, vencimiento:"15/06/2025", estado:"vencido"   } },
+    { id:"1a", label:"Unidad 1A", userId:"other",                expensa:{ periodo:"Mayo 2025", monto:52000, vencimiento:"15/06/2025", estado:"pago"      } },
+  ],
+  // Consorcio c3 — Complejo Los Olivos
+  // Laura Martínez (owner2): 4A
+  c3: [
+    { id:"4a", label:"Unidad 4A", userId:"owner2@consorcia.com", expensa:{ periodo:"Mayo 2025", monto:31000, vencimiento:"05/06/2025", estado:"pago"      } },
   ],
 };
 
@@ -55,7 +82,7 @@ const MOCK_UNIDADES = {
    1. Reemplazá el bloque "MOCK" por fetch/axios
    2. El resto del componente no cambia
 ───────────────────────────────────────── */
-export function useDashboardData(consorcioId, role) {
+export function useDashboardData(consorcioId, role, userEmail) {
   const [data,     setData]     = useState(null);
   const [unidades, setUnidades] = useState([]);
   const [loading,  setLoading]  = useState(true);
@@ -67,26 +94,23 @@ export function useDashboardData(consorcioId, role) {
     setLoading(true);
     setError(null);
 
-    // ── MOCK: simula latencia de red ──────────────────────
-    // Reemplazar este bloque por:
-    //
-    // const res = await fetch(`/api/dashboard?consorcioId=${consorcioId}&role=${role}`);
-    // const json = await res.json();
-    // setData(json.data);
-    // setUnidades(json.unidades);
-    //
-    // ─────────────────────────────────────────────────────
     const timer = setTimeout(() => {
-      const mockData     = MOCK_DATA[consorcioId]     ?? MOCK_DATA["c1"];
-      const mockUnidades = MOCK_UNIDADES[consorcioId] ?? [];
+      const mockData = MOCK_DATA[consorcioId] ?? MOCK_DATA["c1"];
+      const todasUnidades = MOCK_UNIDADES[consorcioId] ?? [];
+
+      // Para roles propietario/inquilino: filtrar solo sus unidades
+      // Para admin/council: no aplica filtro de unidades
+      const unidadesFiltradas = (role === "owner" || role === "tenant")
+        ? todasUnidades.filter(u => u.userId === userEmail)
+        : todasUnidades;
 
       setData(mockData);
-      setUnidades(mockUnidades);
+      setUnidades(unidadesFiltradas);
       setLoading(false);
-    }, 0); // Sin delay real — cambiar a ~300ms al conectar el backend
+    }, 0);
 
     return () => clearTimeout(timer);
-  }, [consorcioId, role]);
+  }, [consorcioId, role, userEmail]);
 
   return { data, unidades, loading, error };
 }

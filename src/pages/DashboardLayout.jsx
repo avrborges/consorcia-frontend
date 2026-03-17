@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import {
   FiGrid, FiSettings, FiBell, FiLogOut,
-  FiMenu, FiX, FiDollarSign, FiHome, FiMessageSquare, FiPieChart, FiPhone, FiFileText
+  FiMenu, FiX, FiDollarSign, FiHome, FiMessageSquare, FiPieChart, FiPhone, FiFileText, FiAlertCircle
 } from "react-icons/fi";
 import logoConsorcia from "../assets/img/consorcia.png";
 import { getStoredUser, logout } from "../features/auth/hooks/useLogin";
@@ -15,6 +15,7 @@ const SIDEBAR_ITEMS = [
   { id: "expensas",      label: "Expensas",           icon: FiDollarSign,    path: "/expensas"      },
   { id: "documentos",    label: "Documentos",         icon: FiFileText,      path: "/documentos"    },
   { id: "mensajes",      label: "Mensajes",           icon: FiMessageSquare, path: "/mensajes"      },
+  { id: "reclamos",      label: "Reclamos",           icon: FiAlertCircle,   path: "/reclamos"      },
   { id: "encuestas",     label: "Encuestas",          icon: FiPieChart,      path: "/encuestas"     },
   { id: "contactos",     label: "Contactos útiles",   icon: FiPhone,         path: "/contactos"     },
   { id: "configuracion", label: "Configuración",      icon: FiSettings,      path: "/configuracion" },
@@ -32,30 +33,51 @@ const BOTTOM_ITEMS = [
 const MOCK_CONSORCIOS = [
   { id: "c1", nombre: "Edificio Las Acacias", direccion: "Av. Corrientes 1234" },
   { id: "c2", nombre: "Torre San Martín",     direccion: "San Martín 567"       },
+  { id: "c3", nombre: "Complejo Los Olivos",  direccion: "Av. Santa Fe 890"     },
 ];
+
+/* Consorcios por usuario — reemplazar por API */
+const MOCK_CONSORCIOS_POR_USUARIO = {
+  "admin@consorcia.com":   ["c1", "c2", "c3"],
+  "council@consorcia.com": ["c1", "c2"],
+  "owner@consorcia.com":   ["c1", "c2"],
+  "owner2@consorcia.com":  ["c3"],
+  "tenant@consorcia.com":  ["c1"],
+};
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [collapsed,    setCollapsed]    = useState(false);
-  const [drawerOpen,   setDrawerOpen]   = useState(false);
-  const [notifOpen,    setNotifOpen]    = useState(false);
-  const [consorcioId,  setConsorcioId]  = useState(MOCK_CONSORCIOS[0].id);
+  const [collapsed,     setCollapsed]     = useState(false);
+  const [drawerOpen,    setDrawerOpen]    = useState(false);
+  const [notifOpen,     setNotifOpen]     = useState(false);
   const [consorcioOpen, setConsorcioOpen] = useState(false);
   const notifRef     = useRef(null);
   const consorcioRef = useRef(null);
 
-  const consorcioActual = MOCK_CONSORCIOS.find(c => c.id === consorcioId) ?? MOCK_CONSORCIOS[0];
-  const tieneMultipleConsorcios = MOCK_CONSORCIOS.length > 1;
-
   const storedUser = getStoredUser();
   const USER = {
-    name:     storedUser?.name ?? "Usuario",
-    initials: storedUser?.name ? storedUser.name.slice(0, 2).toUpperCase() : "U",
-    role:     storedUser?.role ?? "owner",
+    name:     storedUser?.name  ?? "Usuario",
+    initials: storedUser?.name  ? storedUser.name.slice(0, 2).toUpperCase() : "U",
+    role:     storedUser?.role  ?? "owner",
+    email:    storedUser?.email ?? "",
   };
 
-  const handleLogout = () => { logout(); navigate("/login"); };
+  /* Filtra los consorcios del usuario logueado */
+  const idsHabilitados    = MOCK_CONSORCIOS_POR_USUARIO[USER.email] ?? [MOCK_CONSORCIOS[0].id];
+  const consorciosUsuario = MOCK_CONSORCIOS.filter(c => idsHabilitados.includes(c.id));
+
+  /* Función inicializadora — garantiza que el primer render use el consorcio correcto */
+  const [consorcioId, setConsorcioId] = useState(() => {
+    const user    = getStoredUser();
+    const email   = user?.email ?? "";
+    const ids     = MOCK_CONSORCIOS_POR_USUARIO[email] ?? [MOCK_CONSORCIOS[0].id];
+    const lista   = MOCK_CONSORCIOS.filter(c => ids.includes(c.id));
+    return lista[0]?.id ?? MOCK_CONSORCIOS[0].id;
+  });
+
+  const consorcioActual         = consorciosUsuario.find(c => c.id === consorcioId) ?? consorciosUsuario[0];
+  const tieneMultipleConsorcios = consorciosUsuario.length > 1 && USER.role !== "tenant";
 
   useEffect(() => {
     const handler = (e) => {
@@ -70,6 +92,13 @@ export default function DashboardLayout() {
 
   const isActive = (path) => location.pathname.startsWith(path);
   const sidebarW = collapsed ? 64 : 220;
+  const handleLogout = () => { logout(); navigate("/login"); };
+
+  /* Filtra items según rol — inquilino no ve Documentos ni Encuestas */
+  const filterItems = (items) => items.filter(i => {
+    if (USER.role === "tenant" && (i.id === "documentos" || i.id === "encuestas" || i.id === "reclamos")) return false;
+    return true;
+  });
 
   return (
     <div style={{ display:"flex", height:"100vh", overflow:"hidden", background:"#ffffff", fontFamily:"'Raleway', system-ui, sans-serif" }}>
@@ -265,7 +294,7 @@ export default function DashboardLayout() {
           {!collapsed && (
             <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(240,244,248,0.2)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 8px", padding:"0 8px" }}>Principal</p>
           )}
-          {SIDEBAR_ITEMS.filter(i => i.id !== "configuracion").map(item => (
+          {filterItems(SIDEBAR_ITEMS).filter(i => i.id !== "configuracion").map(item => (
             <button key={item.id} onClick={() => navigate(item.path)}
               className={`nav-item ${isActive(item.path) ? "active" : ""}`}
               title={collapsed ? item.label : undefined}
@@ -279,7 +308,7 @@ export default function DashboardLayout() {
             {!collapsed && (
               <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(240,244,248,0.2)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 8px", padding:"0 8px" }}>Sistema</p>
             )}
-            {SIDEBAR_ITEMS.filter(i => i.id === "configuracion").map(item => (
+            {filterItems(SIDEBAR_ITEMS).filter(i => i.id === "configuracion").map(item => (
               <button key={item.id} onClick={() => navigate(item.path)}
                 className={`nav-item ${isActive(item.path) ? "active" : ""}`}
                 title={collapsed ? item.label : undefined}
@@ -339,36 +368,47 @@ export default function DashboardLayout() {
             <style>{`@media (min-width: 1024px) { #btn-collapse-desktop { display: flex !important; } }`}</style>
           </div>
 
-          {/* Centro: selector de consorcio (ambos) */}
+          {/* Centro: logo para tenant / selector de consorcio para otros roles */}
           <div ref={consorcioRef} style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", zIndex:20 }}>
-            <button
-              onClick={() => tieneMultipleConsorcios && setConsorcioOpen(v => !v)}
-              style={{
-                display:"flex", alignItems:"center", gap:6,
-                background: tieneMultipleConsorcios ? "rgba(255,255,255,0.08)" : "transparent",
-                border: tieneMultipleConsorcios ? "1px solid rgba(255,255,255,0.10)" : "none",
-                borderRadius:10, padding: tieneMultipleConsorcios ? "5px 10px 5px 12px" : "5px 4px",
-                cursor: tieneMultipleConsorcios ? "pointer" : "default",
-                touchAction:"manipulation", transition:"background 0.15s",
-              }}
-              onMouseEnter={e => tieneMultipleConsorcios && (e.currentTarget.style.background="rgba(255,255,255,0.12)")}
-              onMouseLeave={e => tieneMultipleConsorcios && (e.currentTarget.style.background="rgba(255,255,255,0.08)")}
-              aria-label="Seleccionar consorcio"
-            >
-              <div style={{ textAlign:"center" }}>
-                <p style={{ fontFamily:"'Raleway',sans-serif", fontSize:10, fontWeight:300, color:"rgba(240,244,248,0.35)", margin:0, letterSpacing:"0.04em", lineHeight:1, marginBottom:2 }}>
-                  Consorcio activo
-                </p>
-                <p style={{ fontFamily:"'Urbanist',sans-serif", fontSize:14, fontWeight:800, color:"#f0f4f8", margin:0, letterSpacing:"0.06em", whiteSpace:"nowrap" }}>
-                  {consorcioActual.nombre}
-                </p>
+            {USER.role === "tenant" ? (
+              /* Logo — inquilino no ve el consorcio */
+              <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                <img src={logoConsorcia} alt="Logo" style={{ width:24, height:24 }} />
+                <span style={{ fontFamily:"'Urbanist', sans-serif", fontWeight:800, fontSize:15, color:"#f0f4f8", letterSpacing:"0.12em" }}>
+                  CONSOR<span style={{ color:"#f9b17a" }}>CIA</span>
+                </span>
               </div>
-              {tieneMultipleConsorcios && (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(240,244,248,0.4)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: consorcioOpen ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 0.2s", flexShrink:0 }}>
-                  <polyline points="6 9 12 15 18 9"/>
-                </svg>
-              )}
-            </button>
+            ) : (
+              /* Selector de consorcio */
+              <>
+                <button
+                  onClick={() => tieneMultipleConsorcios && setConsorcioOpen(v => !v)}
+                  style={{
+                    display:"flex", alignItems:"center", gap:6,
+                    background: tieneMultipleConsorcios ? "rgba(255,255,255,0.08)" : "transparent",
+                    border: tieneMultipleConsorcios ? "1px solid rgba(255,255,255,0.10)" : "none",
+                    borderRadius:10, padding: tieneMultipleConsorcios ? "5px 10px 5px 12px" : "5px 4px",
+                    cursor: tieneMultipleConsorcios ? "pointer" : "default",
+                    touchAction:"manipulation", transition:"background 0.15s",
+                  }}
+                  onMouseEnter={e => tieneMultipleConsorcios && (e.currentTarget.style.background="rgba(255,255,255,0.12)")}
+                  onMouseLeave={e => tieneMultipleConsorcios && (e.currentTarget.style.background="rgba(255,255,255,0.08)")}
+                  aria-label="Seleccionar consorcio"
+                >
+                  <div style={{ textAlign:"center" }}>
+                    <p style={{ fontFamily:"'Raleway',sans-serif", fontSize:10, fontWeight:300, color:"rgba(240,244,248,0.35)", margin:0, letterSpacing:"0.04em", lineHeight:1, marginBottom:2 }}>
+                      Consorcio activo
+                    </p>
+                    <p style={{ fontFamily:"'Urbanist',sans-serif", fontSize:14, fontWeight:800, color:"#f0f4f8", margin:0, letterSpacing:"0.06em", whiteSpace:"nowrap" }}>
+                      {consorcioActual.nombre}
+                    </p>
+                  </div>
+                  {tieneMultipleConsorcios && (
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(240,244,248,0.4)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: consorcioOpen ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 0.2s", flexShrink:0 }}>
+                      <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                  )}
+                </button>
 
             {/* Dropdown */}
             {consorcioOpen && tieneMultipleConsorcios && (
@@ -378,7 +418,7 @@ export default function DashboardLayout() {
                     Mis consorcios
                   </p>
                 </div>
-                {MOCK_CONSORCIOS.map(c => (
+                {consorciosUsuario.map(c => (
                   <div
                     key={c.id}
                     className={`consorcio-option ${c.id === consorcioId ? "selected" : ""}`}
@@ -396,6 +436,8 @@ export default function DashboardLayout() {
                   </div>
                 ))}
               </div>
+            )}
+              </>
             )}
           </div>
 
@@ -520,9 +562,12 @@ export default function DashboardLayout() {
             display:"flex", flexDirection:"column",
             animation:"slideIn 0.22s cubic-bezier(0.4,0,0.2,1)",
           }}>
-            <button
+            <div
+              role="button"
+              tabIndex={0}
               onClick={() => { navigate("/perfil"); setDrawerOpen(false); }}
-              style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"24px 16px 20px", borderBottom:"1px solid rgba(255,255,255,0.06)", background:"#2d3250", border:"none", width:"100%", cursor:"pointer", touchAction:"manipulation", transition:"background 0.15s", textAlign:"left" }}
+              onKeyDown={e => { if (e.key === "Enter") { navigate("/perfil"); setDrawerOpen(false); } }}
+              style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"24px 16px 20px", borderBottom:"1px solid rgba(255,255,255,0.06)", background:"#2d3250", width:"100%", cursor:"pointer", touchAction:"manipulation", transition:"background 0.15s", textAlign:"left" }}
               onMouseEnter={e => e.currentTarget.style.background="#3a4060"}
               onMouseLeave={e => e.currentTarget.style.background="#2d3250"}
               aria-label="Ir a Mi Perfil"
@@ -537,20 +582,23 @@ export default function DashboardLayout() {
                   <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:12, fontWeight:600, color:"#8ecfd1", margin:"4px 0 0", letterSpacing:"0.01em" }}>Mi Perfil &rsaquo;</p>
                 </div>
               </div>
-              <button
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={e => { e.stopPropagation(); setDrawerOpen(false); }}
+                onKeyDown={e => { if (e.key === "Enter") { e.stopPropagation(); setDrawerOpen(false); } }}
                 aria-label="Cerrar menú"
                 style={{ background:"none", border:"none", padding:6, cursor:"pointer", color:"rgba(240,244,248,0.5)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, touchAction:"manipulation", transition:"color 0.15s" }}
                 onMouseEnter={e => e.currentTarget.style.color="#f0f4f8"}
                 onMouseLeave={e => e.currentTarget.style.color="rgba(240,244,248,0.5)"}
               >
                 <FiX size={22} />
-              </button>
-            </button>
+              </div>
+            </div>
 
             <nav style={{ flex:1, padding:"16px 12px", display:"flex", flexDirection:"column", gap:2, overflowY:"auto" }}>
               <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(45,50,80,0.3)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 10px", padding:"0 8px" }}>Principal</p>
-              {SIDEBAR_ITEMS.filter(i => i.id !== "configuracion").map(item => (
+              {filterItems(SIDEBAR_ITEMS).filter(i => i.id !== "configuracion").map(item => (
                 <button key={item.id} onClick={() => { navigate(item.path); setDrawerOpen(false); }} className={`nav-item-light ${isActive(item.path) ? "active" : ""}`}>
                   <item.icon size={20} style={{ flexShrink:0 }} />
                   <span>{item.label}</span>
@@ -558,7 +606,7 @@ export default function DashboardLayout() {
               ))}
               <div style={{ marginTop:"auto", paddingTop:8, borderTop:"1px solid rgba(45,50,80,0.08)" }}>
                 <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(45,50,80,0.3)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 10px", padding:"0 8px" }}>Sistema</p>
-                {SIDEBAR_ITEMS.filter(i => i.id === "configuracion").map(item => (
+                {filterItems(SIDEBAR_ITEMS).filter(i => i.id === "configuracion").map(item => (
                   <button key={item.id} onClick={() => { navigate(item.path); setDrawerOpen(false); }} className={`nav-item-light ${isActive(item.path) ? "active" : ""}`}>
                     <item.icon size={20} style={{ flexShrink:0 }} />
                     <span>{item.label}</span>

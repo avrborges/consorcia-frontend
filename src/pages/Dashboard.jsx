@@ -250,7 +250,8 @@ function CardDocumentos({ navigate, delay, data }) {
 ───────────────────────────────────────── */
 export default function Dashboard() {
   const navigate                   = useNavigate();
-  const { consorcioId = "c1" }     = useOutletContext() ?? {};
+  const outletContext              = useOutletContext();
+  const consorcioId                = outletContext?.consorcioId ?? "c1";
   const storedUser                 = getStoredUser();
   const name                       = storedUser?.name ?? "Usuario";
   const role                       = storedUser?.role ?? "owner";
