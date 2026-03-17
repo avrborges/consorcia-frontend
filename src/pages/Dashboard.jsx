@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { getStoredUser } from "../features/auth/hooks/useLogin";
+import { useDashboardData } from "../hooks/useDashboardData";
 import {
   FiDollarSign, FiMessageSquare, FiPieChart,
-  FiFileText, FiAlertCircle, FiPhone, FiDownload,
+  FiFileText, FiAlertCircle, FiDownload,
 } from "react-icons/fi";
 
 /* ─────────────────────────────────────────
@@ -34,39 +35,6 @@ const ROLE_LABELS = {
    Indexado por consorcioId para simular
    datos distintos por consorcio
 ───────────────────────────────────────── */
-
-const MOCK_UNIDADES = {
-  c1: [
-    { id:"3b", label:"Unidad 3B", expensa:{ periodo:"Mayo 2025", monto:42500, vencimiento:"10/06/2025", estado:"pendiente" } },
-    { id:"7a", label:"Unidad 7A", expensa:{ periodo:"Mayo 2025", monto:38000, vencimiento:"10/06/2025", estado:"pago"      } },
-  ],
-  c2: [
-    { id:"2c", label:"Unidad 2C", expensa:{ periodo:"Mayo 2025", monto:55000, vencimiento:"15/06/2025", estado:"vencido"   } },
-  ],
-};
-
-const MOCK_DATA = {
-  c1: {
-    expensa:   { periodo:"Mayo 2025", monto:42500, vencimiento:"10/06/2025", estado:"pendiente", totalUnidades:24, pagas:18, pendientes:5, vencidas:1 },
-    mensajes:  { sinLeer: 3 },
-    reclamos:  { abiertos: 5 },
-    encuesta:  { titulo:"Pintura del pasillo",  vence:"20/06/2025", participantes:8  },
-    documentos:[
-      { nombre:"Reglamento interno", fecha:"01/05/2025" },
-      { nombre:"Acta reunión abril", fecha:"15/04/2025" },
-    ],
-  },
-  c2: {
-    expensa:   { periodo:"Mayo 2025", monto:55000, vencimiento:"15/06/2025", estado:"vencido", totalUnidades:12, pagas:8, pendientes:2, vencidas:2 },
-    mensajes:  { sinLeer: 7 },
-    reclamos:  { abiertos: 2 },
-    encuesta:  { titulo:"Reglamento uso del SUM", vence:"25/06/2025", participantes:5 },
-    documentos:[
-      { nombre:"Acta asamblea mayo",  fecha:"10/05/2025" },
-      { nombre:"Presupuesto 2025",    fecha:"02/01/2025" },
-    ],
-  },
-};
 
 const ESTADO_CONFIG = {
   pago:      { label:"Pagado",    bg:"rgba(42,107,110,0.08)",  border:"rgba(42,107,110,0.2)",   color:"#2a6b6e", dot:"#2a6b6e" },
@@ -281,23 +249,30 @@ function CardDocumentos({ navigate, delay, data }) {
    Componente principal
 ───────────────────────────────────────── */
 export default function Dashboard() {
-  const navigate      = useNavigate();
-  const { consorcioId = "c1" } = useOutletContext() ?? {};
-  const storedUser    = getStoredUser();
-  const name          = storedUser?.name ?? "Usuario";
-  const role          = storedUser?.role ?? "owner";
-  const greeting      = useMemo(() => getGreeting(), []);
-  const date          = useMemo(() => getFormattedDate(), []);
-  const dateFormatted = date.charAt(0).toUpperCase() + date.slice(1);
+  const navigate                   = useNavigate();
+  const { consorcioId = "c1" }     = useOutletContext() ?? {};
+  const storedUser                 = getStoredUser();
+  const name                       = storedUser?.name ?? "Usuario";
+  const role                       = storedUser?.role ?? "owner";
+  const greeting                   = useMemo(() => getGreeting(), []);
+  const date                       = useMemo(() => getFormattedDate(), []);
+  const dateFormatted              = date.charAt(0).toUpperCase() + date.slice(1);
 
-  /* Datos del consorcio activo */
-  const data     = MOCK_DATA[consorcioId] ?? MOCK_DATA["c1"];
-  const unidades = MOCK_UNIDADES[consorcioId] ?? [];
+  /* Datos del consorcio activo via hook */
+  const { data, unidades, loading } = useDashboardData(consorcioId, role);
 
-  /* Selector de unidad — solo para owner con múltiples unidades */
-  const [unidadId, setUnidadId] = useState(unidades[0]?.id ?? null);
-  const unidadActual = unidades.find(u => u.id === unidadId) ?? unidades[0];
-  const tieneMultipleUnidades = role === "owner" && unidades.length > 1;
+  /* Selector de unidad */
+  const [unidadId, setUnidadId]    = useState(null);
+
+  // Inicializa la unidad activa cuando cargan los datos del consorcio
+  useEffect(() => {
+    if (unidades.length > 0) setUnidadId(unidades[0].id);
+  }, [consorcioId, unidades]);
+
+  const unidadActual               = unidades.find(u => u.id === unidadId) ?? unidades[0];
+  const tieneMultipleUnidades      = role === "owner" && unidades.length > 1;
+
+  if (loading || !data) return null;
 
   return (
     <div style={{ minHeight:"100%", fontFamily:"'Raleway', sans-serif", display:"flex", flexDirection:"column", gap:16 }}>
