@@ -26,7 +26,8 @@ function sleep(ms) {
 ───────────────────────────────────────── */
 const MOCK_CREDENTIALS = [
   { email: "admin@consorcia.com",   password: "Admin123",   role: "admin",   name: "Administrador"   },
-  { email: "council@consorcia.com", password: "Council1",   role: "council", name: "Consejo"         },
+  { email: "council@consorcia.com",  password: "Council1",  role: "council", name: "Carlos Méndez"  },
+  { email: "council2@consorcia.com", password: "Council2",  role: "council", name: "Marta Suárez"   },
   { email: "owner@consorcia.com",   password: "Owner123",   role: "owner",   name: "Juan Pérez"      },
   { email: "owner2@consorcia.com",  password: "Owner1234", role: "owner",   name: "Laura Martínez"  },
   { email: "tenant@consorcia.com",  password: "Tenant123",  role: "tenant",  name: "Inquilino"       },

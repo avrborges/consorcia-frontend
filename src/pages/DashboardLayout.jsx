@@ -14,7 +14,7 @@ const SIDEBAR_ITEMS = [
   { id: "dashboard",     label: "Inicio",             icon: FiHome,          path: "/dashboard"     },
   { id: "expensas",      label: "Expensas",           icon: FiDollarSign,    path: "/expensas"      },
   { id: "documentos",    label: "Documentos",         icon: FiFileText,      path: "/documentos"    },
-  { id: "mensajes",      label: "Mensajes",           icon: FiMessageSquare, path: "/mensajes"      },
+  { id: "anuncios",     label: "Anuncios",           icon: FiMessageSquare, path: "/anuncios"      },
   { id: "reclamos",      label: "Reclamos",           icon: FiAlertCircle,   path: "/reclamos"      },
   { id: "encuestas",     label: "Encuestas",          icon: FiPieChart,      path: "/encuestas"     },
   { id: "contactos",     label: "Contactos útiles",   icon: FiPhone,         path: "/contactos"     },
@@ -25,7 +25,7 @@ const SIDEBAR_ITEMS = [
 const BOTTOM_ITEMS = [
   { id: "dashboard", label: "Inicio",    icon: FiHome,          path: "/dashboard" },
   { id: "expensas",  label: "Expensas",  icon: FiDollarSign,    path: "/expensas"  },
-  { id: "mensajes",  label: "Mensajes",  icon: FiMessageSquare, path: "/mensajes"  },
+  { id: "anuncios",  label: "Anuncios",  icon: FiMessageSquare, path: "/anuncios"  },
   { id: "encuestas", label: "Encuestas", icon: FiPieChart,      path: "/encuestas" },
 ];
 
@@ -66,6 +66,18 @@ export default function DashboardLayout() {
   /* Filtra los consorcios del usuario logueado */
   const idsHabilitados    = MOCK_CONSORCIOS_POR_USUARIO[USER.email] ?? [MOCK_CONSORCIOS[0].id];
   const consorciosUsuario = MOCK_CONSORCIOS.filter(c => idsHabilitados.includes(c.id));
+
+  /* Label de Reclamos según rol */
+  const reclamosLabel = (USER.role === "owner" || USER.role === "tenant")
+    ? "Mis Reclamos / Pedidos"
+    : "Reclamos";
+
+  const sidebarItems = SIDEBAR_ITEMS.map(item =>
+    item.id === "reclamos" ? { ...item, label: reclamosLabel } : item
+  );
+  const bottomItems = BOTTOM_ITEMS.map(item =>
+    item.id === "reclamos" ? { ...item, label: reclamosLabel } : item
+  );
 
   /* Función inicializadora — garantiza que el primer render use el consorcio correcto */
   const [consorcioId, setConsorcioId] = useState(() => {
@@ -294,7 +306,7 @@ export default function DashboardLayout() {
           {!collapsed && (
             <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(240,244,248,0.2)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 8px", padding:"0 8px" }}>Principal</p>
           )}
-          {filterItems(SIDEBAR_ITEMS).filter(i => i.id !== "configuracion").map(item => (
+          {filterItems(sidebarItems).filter(i => i.id !== "configuracion").map(item => (
             <button key={item.id} onClick={() => navigate(item.path)}
               className={`nav-item ${isActive(item.path) ? "active" : ""}`}
               title={collapsed ? item.label : undefined}
@@ -308,7 +320,7 @@ export default function DashboardLayout() {
             {!collapsed && (
               <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(240,244,248,0.2)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 8px", padding:"0 8px" }}>Sistema</p>
             )}
-            {filterItems(SIDEBAR_ITEMS).filter(i => i.id === "configuracion").map(item => (
+            {filterItems(sidebarItems).filter(i => i.id === "configuracion").map(item => (
               <button key={item.id} onClick={() => navigate(item.path)}
                 className={`nav-item ${isActive(item.path) ? "active" : ""}`}
                 title={collapsed ? item.label : undefined}
@@ -598,7 +610,7 @@ export default function DashboardLayout() {
 
             <nav style={{ flex:1, padding:"16px 12px", display:"flex", flexDirection:"column", gap:2, overflowY:"auto" }}>
               <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(45,50,80,0.3)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 10px", padding:"0 8px" }}>Principal</p>
-              {filterItems(SIDEBAR_ITEMS).filter(i => i.id !== "configuracion").map(item => (
+              {filterItems(sidebarItems).filter(i => i.id !== "configuracion").map(item => (
                 <button key={item.id} onClick={() => { navigate(item.path); setDrawerOpen(false); }} className={`nav-item-light ${isActive(item.path) ? "active" : ""}`}>
                   <item.icon size={20} style={{ flexShrink:0 }} />
                   <span>{item.label}</span>
@@ -606,7 +618,7 @@ export default function DashboardLayout() {
               ))}
               <div style={{ marginTop:"auto", paddingTop:8, borderTop:"1px solid rgba(45,50,80,0.08)" }}>
                 <p style={{ fontFamily:"'Raleway', sans-serif", fontSize:10, fontWeight:600, color:"rgba(45,50,80,0.3)", letterSpacing:"0.12em", textTransform:"uppercase", margin:"4px 4px 10px", padding:"0 8px" }}>Sistema</p>
-                {filterItems(SIDEBAR_ITEMS).filter(i => i.id === "configuracion").map(item => (
+                {filterItems(sidebarItems).filter(i => i.id === "configuracion").map(item => (
                   <button key={item.id} onClick={() => { navigate(item.path); setDrawerOpen(false); }} className={`nav-item-light ${isActive(item.path) ? "active" : ""}`}>
                     <item.icon size={20} style={{ flexShrink:0 }} />
                     <span>{item.label}</span>
@@ -624,7 +636,7 @@ export default function DashboardLayout() {
 
       {/* ══════════ BOTTOM NAV mobile ══════════ */}
       <nav className="bottom-nav" aria-label="Navegación principal">
-        {BOTTOM_ITEMS.map(item => (
+        {bottomItems.map(item => (
           <button key={item.id} onClick={() => navigate(item.path)}
             className={`bottom-nav-item ${isActive(item.path) ? "active" : ""}`}
             aria-label={item.label}
