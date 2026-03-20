@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { getStoredUser } from "../features/auth/hooks/useLogin";
+import { getStoredUser } from "../hooks/useLogin"
 import { useDashboardData } from "../hooks/useDashboardData";
 import {
   FiDollarSign, FiMessageSquare, FiPieChart,

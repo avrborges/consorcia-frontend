@@ -5,7 +5,7 @@ import {
   FiMenu, FiX, FiDollarSign, FiHome, FiMessageSquare, FiPieChart, FiPhone, FiFileText, FiAlertCircle
 } from "react-icons/fi";
 import logoConsorcia from "../assets/img/consorcia.png";
-import { getStoredUser, logout } from "../features/auth/hooks/useLogin";
+import { getStoredUser, logout } from "../hooks/useLogin";
 
 const APP_VERSION = "v1.0.0";
 

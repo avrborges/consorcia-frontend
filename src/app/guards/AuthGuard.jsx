@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { isAuthenticated } from "../../features/auth/hooks/useLogin";
+import { isAuthenticated } from "../../hooks/useLogin";
 
 export default function AuthGuard({ children }) {
   if (!isAuthenticated()) {

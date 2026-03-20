@@ -104,6 +104,25 @@ export default function LoginBranding({ onBack }) {
           </div>
         </div>
 
+        {/* Botón volver — solo desktop */}
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="Volver al inicio"
+          className="
+            hidden lg:inline-flex self-start items-center gap-[6px]
+            px-3 py-[7px] rounded-[10px]
+            bg-[rgba(255,255,255,0.07)] border border-[rgba(255,255,255,0.10)]
+            text-[rgba(240,244,248,0.6)] text-[12px] font-['Raleway'] font-medium
+            cursor-pointer touch-manipulation mb-6
+            transition-all duration-150
+            hover:bg-[rgba(255,255,255,0.12)] hover:text-[#f0f4f8]
+          "
+        >
+          <FiArrowLeft size={14} />
+          Volver
+        </button>
+
         {/* Branding desktop */}
         <div className="hidden lg:flex flex-col items-center text-center gap-6">
           <img src={logoConsorcia} alt="Logo CONSORCIA" className="w-24 h-24 select-none" />

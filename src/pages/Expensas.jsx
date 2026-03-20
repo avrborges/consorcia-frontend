@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { getStoredUser } from "../features/auth/hooks/useLogin";
+import { getStoredUser } from "../hooks/useLogin";
 import { useExpensasData } from "../hooks/useExpensasData";
 
 import {
