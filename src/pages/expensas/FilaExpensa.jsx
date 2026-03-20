@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FiDownload, FiChevronDown, FiChevronUp,
   FiAlertCircle, FiCreditCard,
@@ -58,8 +59,8 @@ export default function FilaExpensa({
   tendencia = null,
   itemMorosidad = null,
 }) {
-  const [open, setOpen]           = useState(defaultOpen);
-  const [pagando, setPagando]     = useState(false);
+  const navigate = useNavigate();
+  const [open, setOpen]               = useState(defaultOpen);
   const [descargando, setDescargando] = useState({});
 
   const panelId = `exp-panel-${exp.id}`;
@@ -69,12 +70,6 @@ export default function FilaExpensa({
   const itemsEfectivos = itemMorosidad ? [...exp.items, itemMorosidad] : exp.items;
   const montoEfectivo  = itemsEfectivos.reduce((s, i) => s + i.monto, 0);
   const esPagable      = isUltimoMes && (exp.estado === "pendiente" || exp.estado === "vencido");
-
-  const handlePagar = () => {
-    if (pagando) return;
-    setPagando(true);
-    setTimeout(() => { setPagando(false); onPaid?.(exp.id); }, 1400);
-  };
 
   const handleDescargar = () => {
     if (descargando["dl"]) return;
@@ -268,9 +263,8 @@ export default function FilaExpensa({
               {esPagable && (
                 <button
                   type="button"
-                  onClick={handlePagar}
-                  disabled={pagando}
-                  className="inline-flex items-center gap-[7px] px-[22px] py-[9px] rounded-[10px] border-none font-['Raleway'] text-[12px] font-bold text-white cursor-pointer touch-manipulation transition-all duration-[180ms] disabled:opacity-75 disabled:cursor-not-allowed"
+                  onClick={() => navigate(`/expensas/pagar/${exp.id}`)}
+                  className="inline-flex items-center gap-[7px] px-[22px] py-[9px] rounded-[10px] border-none font-['Raleway'] text-[12px] font-bold text-white cursor-pointer touch-manipulation transition-all duration-[180ms] hover:-translate-y-px active:scale-[0.97]"
                   style={{
                     background: exp.estado === "vencido"
                       ? "linear-gradient(135deg, #b91c1c, #dc2626)"
@@ -280,14 +274,7 @@ export default function FilaExpensa({
                       : "0 4px 14px rgba(42,107,110,0.28)",
                   }}
                 >
-                  {pagando ? (
-                    <>
-                      <span className="w-[13px] h-[13px] rounded-full border-2 border-[rgba(255,255,255,0.35)] border-t-white animate-spin inline-block" />
-                      Procesando...
-                    </>
-                  ) : (
-                    <><FiCreditCard size={13} /> Pagar ahora</>
-                  )}
+                  <FiCreditCard size={13} /> Pagar ahora
                 </button>
               )}
             </div>

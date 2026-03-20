@@ -1,11 +1,12 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 // Páginas
-import HomePage from '../pages/HomePage'
-import LoginPage from '../pages/LoginPage'
-import Dashboard from '../pages/Dashboard'
-import ForgotPasswordPage from '../pages/ForgotPasswordPage'
-import DashboardLayout from '../pages/DashboardLayout'
-import Expensas from '../pages/Expensas'
+import HomePage           from '../pages/home'
+import LoginPage          from '../pages/login'
+import ForgotPasswordPage from '../pages/forgot-password'
+import DashboardLayout    from '../pages/dashboard-layout'
+import Dashboard          from '../pages/dashboard'
+import Expensas           from '../pages/expensas'
+import PagoPage           from '../pages/expensas/pago'
 // Guards
 import AuthGuard from './guards/AuthGuard'
 // Estilos globales
@@ -25,8 +26,9 @@ function App() {
             <DashboardLayout />
           </AuthGuard>
         }>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/expensas"  element={<Expensas />} />
+          <Route path="/dashboard"              element={<Dashboard />} />
+          <Route path="/expensas"               element={<Expensas />} />
+          <Route path="/expensas/pagar/:id"     element={<PagoPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
